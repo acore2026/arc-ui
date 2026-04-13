@@ -18,7 +18,6 @@ import {
   Cpu,
   Database,
   Globe2,
-  Route,
   Shield,
   Smartphone,
   Waypoints,
@@ -75,10 +74,11 @@ const ArchitectureNode: React.FC<{ data: ArchitectureNodeData; selected?: boolea
   }
 
   const isPillNode = data.type === 'phone' || data.type === 'srf' || (data.type === 'gateway' && data.label === 'IGW');
+  const showCardHandles = data.type !== 'nf';
 
   return (
     <div className={`arch-node arch-node-${data.type} ${isPillNode ? 'arch-node-pill' : ''} ${selected ? 'is-selected' : ''}`}>
-      <Handle type="target" position={Position.Left} className="arch-card-handle" />
+      {showCardHandles && <Handle type="target" position={Position.Left} className="arch-card-handle" />}
       <div className="arch-node-heading">
         <div className="arch-node-icon">
           <NodeIcon type={data.type} />
@@ -115,7 +115,7 @@ const ArchitectureNode: React.FC<{ data: ArchitectureNodeData; selected?: boolea
         </div>
       )}
 
-      <Handle type="source" position={Position.Right} className="arch-card-handle arch-card-source" />
+      {showCardHandles && <Handle type="source" position={Position.Right} className="arch-card-handle arch-card-source" />}
       {(data.type === 'agent' || data.type === 'gateway') && (
         <Handle id="tool-source" type="source" position={Position.Bottom} className="arch-card-handle arch-tool-source" />
       )}
@@ -144,8 +144,29 @@ const AutoFitViewport: React.FC = () => {
     };
 
     refit();
+    const flowWrapper = document.querySelector('.arch-flow-wrap');
+    let animationFrame: number | null = null;
+    const observer = flowWrapper
+      ? new ResizeObserver(() => {
+          if (animationFrame !== null) {
+            window.cancelAnimationFrame(animationFrame);
+          }
+          animationFrame = window.requestAnimationFrame(refit);
+        })
+      : null;
+
+    if (flowWrapper && observer) {
+      observer.observe(flowWrapper);
+    }
+
     window.addEventListener('resize', refit);
-    return () => window.removeEventListener('resize', refit);
+    return () => {
+      window.removeEventListener('resize', refit);
+      observer?.disconnect();
+      if (animationFrame !== null) {
+        window.cancelAnimationFrame(animationFrame);
+      }
+    };
   }, [fitView, nodesReady]);
 
   return null;
@@ -164,9 +185,10 @@ const ArchitectureGraph: React.FC = () => {
   }, []);
   const [nodes, , onNodesChange] = useNodesState(ARCHITECTURE_NODES);
   const [edges, , onEdgesChange] = useEdgesState(defaultEdges);
-  const [exportLabel, setExportLabel] = useState('Export layout');
+  const [showLines, setShowLines] = useState(false);
+  const [exportLabel, setExportLabel] = useState('Copy JSON');
 
-  const handleExportLayout = () => {
+  const handleCopyLayout = async () => {
     const payload = nodes.map((node) => {
       const style = node.style as Record<string, unknown> | undefined;
       const width = typeof style?.width === 'number' ? style.width : node.width;
@@ -181,16 +203,28 @@ const ArchitectureGraph: React.FC = () => {
         ...(node.data.type === 'domain' ? { size: { width, height } } : {}),
       };
     });
+    const json = `${JSON.stringify(payload, null, 2)}\n`;
 
-    const blob = new Blob([`${JSON.stringify(payload, null, 2)}\n`], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'topology-layout.json';
-    link.click();
-    URL.revokeObjectURL(url);
-    setExportLabel('Exported');
-    window.setTimeout(() => setExportLabel('Export layout'), 1200);
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(json);
+      } else {
+        const textArea = document.createElement('textarea');
+        textArea.value = json;
+        textArea.setAttribute('readonly', 'true');
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-9999px';
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+      }
+      setExportLabel('Copied JSON');
+    } catch {
+      setExportLabel('Copy failed');
+    } finally {
+      window.setTimeout(() => setExportLabel('Copy JSON'), 1200);
+    }
   };
 
   return (
@@ -198,24 +232,21 @@ const ArchitectureGraph: React.FC = () => {
       <header className="arch-topbar">
         <div className="arch-brand">
           <div className="arch-brand-mark">
-            <Zap size={18} />
+            <Zap size={15} />
           </div>
-          <div>
-            <h1>Agentic Core Topology</h1>
-            <p>Skill discovery and NF tool-call sandbox</p>
-          </div>
+          <h1>Agentic Core Topology</h1>
         </div>
 
-        <div className="arch-scenario-pill">
-          <span>Topology sandbox</span>
-          ACRF discovers skills. Agents call NF tool handles.
-        </div>
-
-        <div className="arch-legend">
-          <span className="arch-legend-item is-discovery">Skills</span>
-          <span className="arch-legend-item is-tool">Tool handles</span>
-          <span className="arch-legend-item is-handoff">Agent handoff</span>
-          <button type="button" className="arch-export-button" onClick={handleExportLayout}>
+        <div className="arch-topbar-actions">
+          <button
+            type="button"
+            className={`arch-toggle-button ${showLines ? 'is-active' : ''}`}
+            aria-pressed={showLines}
+            onClick={() => setShowLines((value) => !value)}
+          >
+            {showLines ? 'Hide lines' : 'Show lines'}
+          </button>
+          <button type="button" className="arch-export-button" onClick={handleCopyLayout}>
             {exportLabel}
           </button>
         </div>
@@ -223,21 +254,10 @@ const ArchitectureGraph: React.FC = () => {
 
       <main className="arch-layout">
         <section className="arch-canvas-shell" aria-label="Agentic topology sandbox">
-          <div className="arch-canvas-header">
-            <div>
-              <div className="arch-eyebrow">Topology</div>
-              <h2>Readable topology foundation for discovery and tool invocation</h2>
-            </div>
-            <div className="arch-static-badge">
-              <Route size={14} />
-              Static sandbox
-            </div>
-          </div>
-
           <div className="arch-flow-wrap">
             <ReactFlow
               nodes={nodes}
-              edges={edges}
+              edges={showLines ? edges : []}
               nodeTypes={nodeTypes}
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}

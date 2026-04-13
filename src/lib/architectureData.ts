@@ -285,7 +285,7 @@ const edge = (
   target,
   sourceHandle,
   targetHandle,
-  type: 'smoothstep',
+  type: 'default',
   data: { kind },
 });
 
