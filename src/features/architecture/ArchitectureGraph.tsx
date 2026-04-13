@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import {
-  Background,
-  BackgroundVariant,
   Controls,
   ReactFlow,
   Handle,
@@ -12,7 +10,7 @@ import {
 } from '@xyflow/react';
 import { 
   Cpu, Database, Router, Shield, 
-  Smartphone, Bot, Info, X, Globe, Layout, Glasses
+  Smartphone, Bot, Info, X, Globe, Layout
 } from 'lucide-react';
 import { ARCHITECTURE_NODES, ARCHITECTURE_EDGES, type ArchitectureNodeData } from '../../lib/architectureData';
 import '@xyflow/react/dist/style.css';
@@ -20,14 +18,9 @@ import './ArchitectureGraph.css';
 
 // --- CUSTOM NODE COMPONENT ---
 
-const NodeIcon: React.FC<{ type: ArchitectureNodeData['type']; label?: string }> = ({ type, label = '' }) => {
-  const labelLower = label.toLowerCase();
-  
+const NodeIcon: React.FC<{ type: ArchitectureNodeData['type'] }> = ({ type }) => {
   switch (type) {
     case 'ue': 
-      if (labelLower.includes('phone')) return <Smartphone size={18} />;
-      if (labelLower.includes('robot')) return <Bot size={18} />;
-      if (labelLower.includes('glasses')) return <Glasses size={18} />;
       return <Smartphone size={18} />;
     case 'app': return <Layout size={18} />;
     case 'ran': return <Router size={18} />;
@@ -35,20 +28,23 @@ const NodeIcon: React.FC<{ type: ArchitectureNodeData['type']; label?: string }>
     case 'registry': return <Database size={18} />;
     case 'agent': return <Bot size={18} />;
     case 'gateway': return <Globe size={18} />;
+    case 'policy': return <Shield size={18} />;
     default: return <Shield size={18} />;
   }
 };
 
 const ArchitectureNode: React.FC<{ data: ArchitectureNodeData; selected?: boolean }> = ({ data, selected }) => {
   if (data.type === 'domain') {
+    const domainIcon = data.domain === 'Device' ? <Smartphone size={14} /> : data.domain === 'App' ? <Layout size={14} /> : <Globe size={14} />;
+
     return (
       <div className="arch-domain-label-container">
-        <div className="arch-domain-header">
-          {data.label === 'DEVICE DOMAIN' && <Smartphone size={14} />}
-          {data.label === 'APP DOMAIN' && <Layout size={14} />}
-          {data.label === 'NETWORK DOMAIN' && <Globe size={14} />}
-          <span>{data.label}</span>
-        </div>
+        {!data.hideTitle && (
+          <div className="arch-domain-header">
+            {domainIcon}
+            <span>{data.label}</span>
+          </div>
+        )}
       </div>
     );
   }
@@ -58,7 +54,7 @@ const ArchitectureNode: React.FC<{ data: ArchitectureNodeData; selected?: boolea
       <Handle type="target" position={Position.Left} style={{ visibility: 'hidden' }} />
       <Handle type="target" position={Position.Top} style={{ visibility: 'hidden' }} />
       <div className="arch-node-icon">
-        <NodeIcon type={data.type} label={data.label} />
+        <NodeIcon type={data.type} />
       </div>
       <div className="arch-node-label">{data.label}</div>
       <Handle type="source" position={Position.Right} style={{ visibility: 'hidden' }} />
@@ -77,13 +73,36 @@ const ArchitectureGraph: React.FC = () => {
   const [nodes, , onNodesChange] = useNodesState(ARCHITECTURE_NODES);
   const [edges, , onEdgesChange] = useEdgesState(ARCHITECTURE_EDGES);
   const [selectedNode, setSelectedNode] = useState<ArchitectureNodeData | null>(null);
+  const [exportStatus, setExportStatus] = useState('Export positions');
 
   const onNodeClick = (_: React.MouseEvent, node: Node) => {
-    setSelectedNode(node.data as ArchitectureNodeData);
+    setSelectedNode(node.data as unknown as ArchitectureNodeData);
   };
 
   const onPaneClick = () => {
     setSelectedNode(null);
+  };
+
+  const handleExportPositions = () => {
+    const positions = nodes
+      .filter((node) => (node.data as unknown as ArchitectureNodeData).type !== 'domain')
+      .map((node) => ({
+        id: node.id,
+        label: (node.data as unknown as ArchitectureNodeData).label,
+        parentId: node.parentId ?? null,
+        position: node.position,
+      }));
+
+    const blob = new Blob([`${JSON.stringify(positions, null, 2)}\n`], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'architecture-card-positions.json';
+    link.click();
+    URL.revokeObjectURL(url);
+
+    setExportStatus('Exported');
+    window.setTimeout(() => setExportStatus('Export positions'), 1400);
   };
 
   return (
@@ -97,24 +116,27 @@ const ArchitectureGraph: React.FC = () => {
         onNodeClick={onNodeClick}
         onPaneClick={onPaneClick}
         fitView
-        fitViewOptions={{ padding: 0.2 }}
+        fitViewOptions={{ padding: 0.05 }}
         minZoom={0.5}
-        maxZoom={1.5}
+        maxZoom={2}
         defaultEdgeOptions={{ 
-          type: 'smoothstep',
-          style: { strokeWidth: 2, stroke: '#94a3b8' }
+          type: 'simplebezier',
+          style: { strokeWidth: 1.6, stroke: '#d1d5db' }
         }}
       >
-        <Background variant={BackgroundVariant.Dots} gap={20} color="#e2e8f0" />
         <Controls showInteractive={false} />
       </ReactFlow>
+
+      <button type="button" className="arch-export-button" onClick={handleExportPositions}>
+        {exportStatus}
+      </button>
 
       {/* INSPECTOR OVERLAY */}
       {selectedNode && (
         <div className="arch-inspector">
           <div className="arch-inspector-header">
             <div className="arch-inspector-title">
-              <NodeIcon type={selectedNode.type} label={selectedNode.label} />
+              <NodeIcon type={selectedNode.type} />
               <span>{selectedNode.label}</span>
             </div>
             <button onClick={() => setSelectedNode(null)} className="arch-inspector-close">
@@ -143,15 +165,6 @@ const ArchitectureGraph: React.FC = () => {
         </div>
       )}
 
-      {/* LEGEND */}
-      <div className="arch-legend">
-        <div className="arch-legend-item"><div className="arch-dot ue" /> UE</div>
-        <div className="arch-legend-item"><div className="arch-dot ran" /> RAN</div>
-        <div className="arch-legend-item"><div className="arch-dot core" /> CORE</div>
-        <div className="arch-legend-item"><div className="arch-dot agent" /> AGENT</div>
-        <div className="arch-legend-item"><div className="arch-dot app" /> APP</div>
-        <div className="arch-legend-item"><div className="arch-dot registry" /> REGISTRY</div>
-      </div>
     </div>
   );
 };

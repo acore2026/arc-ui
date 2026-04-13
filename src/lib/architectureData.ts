@@ -1,9 +1,10 @@
-import { MarkerType, type Node } from '@xyflow/react';
+import type { Node } from '@xyflow/react';
 
 export interface ArchitectureNodeData {
   label: string;
-  type: 'ue' | 'app' | 'agent' | 'core' | 'registry' | 'gateway' | 'domain' | 'ran';
-  domain?: 'Device' | 'Network' | 'App';
+  type: 'ue' | 'app' | 'agent' | 'core' | 'registry' | 'gateway' | 'domain' | 'ran' | 'policy';
+  domain?: 'Device' | 'Network' | 'App' | 'Agent' | 'ConnectionNF';
+  hideTitle?: boolean;
   description?: string;
   properties?: Record<string, string>;
 }
@@ -11,25 +12,25 @@ export interface ArchitectureNodeData {
 export const ARCHITECTURE_NODES: Node[] = [
   // --- DOMAIN GROUPS (Parent Nodes) ---
   {
-    id: 'group-app',
-    type: 'architectureNode',
-    position: { x: 20, y: 20 },
-    style: { width: 260, height: 220, backgroundColor: 'rgba(238, 242, 255, 0.4)', border: '2px dashed #e0e7ff', borderRadius: '16px' },
-    data: { label: 'APP DOMAIN', type: 'domain' },
-  },
-  {
     id: 'group-device',
     type: 'architectureNode',
-    position: { x: 20, y: 300 },
-    style: { width: 260, height: 340, backgroundColor: 'rgba(255, 241, 242, 0.4)', border: '2px dashed #fecdd3', borderRadius: '16px' },
-    data: { label: 'DEVICE DOMAIN', type: 'domain' },
+    position: { x: 20, y: 20 },
+    style: { width: 260, height: 180, backgroundColor: 'rgba(240, 253, 250, 0.55)', border: '2px dashed #99f6e4', borderRadius: '8px' },
+    data: { label: 'DEVICE DOMAIN', type: 'domain', domain: 'Device' },
   },
   {
-    id: 'group-network',
+    id: 'group-agent',
     type: 'architectureNode',
-    position: { x: 320, y: 20 },
-    style: { width: 950, height: 620, backgroundColor: 'rgba(241, 245, 249, 0.4)', border: '2px dashed #cbd5e1', borderRadius: '16px' },
-    data: { label: 'NETWORK DOMAIN', type: 'domain' },
+    position: { x: 520, y: 20 },
+    style: { width: 740, height: 470, backgroundColor: 'rgba(245, 243, 255, 0.38)', border: '2px dashed #ddd6fe', borderRadius: '8px' },
+    data: { label: 'AGENT DOMAIN', type: 'domain', domain: 'Agent', hideTitle: true },
+  },
+  {
+    id: 'group-connection-nf',
+    type: 'architectureNode',
+    position: { x: 20, y: 260 },
+    style: { width: 440, height: 300, backgroundColor: 'rgba(236, 253, 245, 0.38)', border: '2px dashed #bbf7d0', borderRadius: '8px' },
+    data: { label: 'CONNECTION NF DOMAIN', type: 'domain', domain: 'ConnectionNF', hideTitle: true },
   },
 
   // --- DEVICE DOMAIN NODES ---
@@ -47,72 +48,12 @@ export const ARCHITECTURE_NODES: Node[] = [
       properties: { 'ID': 'SUCI_P001', 'Status': 'Active' }
     },
   },
-  {
-    id: 'ue-robot',
-    parentId: 'group-device',
-    type: 'architectureNode',
-    position: { x: 80, y: 140 },
-    extent: 'parent',
-    data: { 
-      label: 'Robot', 
-      type: 'ue',
-      domain: 'Device',
-      description: 'Autonomous robotic system for industrial or service use.',
-      properties: { 'ID': 'SUCI_R001', 'Status': 'Idle' }
-    },
-  },
-  {
-    id: 'ue-glasses',
-    parentId: 'group-device',
-    type: 'architectureNode',
-    position: { x: 80, y: 240 },
-    extent: 'parent',
-    data: { 
-      label: 'Glasses', 
-      type: 'ue',
-      domain: 'Device',
-      description: 'AR/VR glasses for immersive experiences.',
-      properties: { 'ID': 'SUCI_G001', 'Status': 'Connected' }
-    },
-  },
 
-  // --- APP DOMAIN NODES ---
-  {
-    id: 'app-layer',
-    parentId: 'group-app',
-    type: 'architectureNode',
-    position: { x: 40, y: 80 },
-    extent: 'parent',
-    data: { 
-      label: 'App (Telegram/A2UI)', 
-      type: 'app',
-      domain: 'App',
-      description: 'User-facing application interfaces providing natural language interaction.',
-      properties: { 'Interface': 'Web/Mobile', 'Input': 'Voice/Text' }
-    },
-  },
-
-  // --- NETWORK DOMAIN NODES ---
-  {
-    id: 'nef',
-    parentId: 'group-network',
-    type: 'architectureNode',
-    position: { x: 40, y: 60 },
-    extent: 'parent',
-    data: { 
-      label: 'NEF (NRF/GW)', 
-      type: 'gateway',
-      domain: 'Network',
-      description: 'Network Exposure Function and Gateway. Acts as the interface between App and Network.',
-      properties: { 'Access': 'Secure', 'API': 'REST/gRPC' }
-    },
-  },
+  // --- TOP-LEFT NETWORK ACCESS NODE ---
   {
     id: 'srf',
-    parentId: 'group-network',
     type: 'architectureNode',
-    position: { x: 40, y: 360 },
-    extent: 'parent',
+    position: { x: 320, y: 70 },
     data: { 
       label: 'SRF', 
       type: 'core',
@@ -121,86 +62,160 @@ export const ARCHITECTURE_NODES: Node[] = [
       properties: { 'Latency': '<0.5ms', 'Protocol': '6G-S' }
     },
   },
+
+  // --- CONNECTION NF DOMAIN NODES ---
+  {
+    id: 'amf',
+    parentId: 'group-connection-nf',
+    type: 'architectureNode',
+    position: { x: 40, y: 60 },
+    extent: 'parent',
+    data: {
+      label: 'AMF',
+      type: 'core',
+      domain: 'ConnectionNF',
+      description: 'Access and mobility function for connection session control.',
+      properties: { 'Role': 'Access', 'Status': 'Ready' }
+    },
+  },
+  {
+    id: 'smf',
+    parentId: 'group-connection-nf',
+    type: 'architectureNode',
+    position: { x: 170, y: 60 },
+    extent: 'parent',
+    data: {
+      label: 'SMF',
+      type: 'core',
+      domain: 'ConnectionNF',
+      description: 'Session management function for connection setup.',
+      properties: { 'Role': 'Session', 'Status': 'Ready' }
+    },
+  },
+  {
+    id: 'pcf',
+    parentId: 'group-connection-nf',
+    type: 'architectureNode',
+    position: { x: 300, y: 60 },
+    extent: 'parent',
+    data: {
+      label: 'PCF',
+      type: 'policy',
+      domain: 'ConnectionNF',
+      description: 'Policy control function for connection policy decisions.',
+      properties: { 'Role': 'Policy', 'Status': 'Ready' }
+    },
+  },
+  {
+    id: 'db',
+    parentId: 'group-connection-nf',
+    type: 'architectureNode',
+    position: { x: 105, y: 180 },
+    extent: 'parent',
+    data: {
+      label: 'DB',
+      type: 'registry',
+      domain: 'ConnectionNF',
+      description: 'Connection-state and subscriber data store.',
+      properties: { 'Role': 'Store', 'Status': 'Ready' }
+    },
+  },
+  {
+    id: 'upf',
+    parentId: 'group-connection-nf',
+    type: 'architectureNode',
+    position: { x: 235, y: 180 },
+    extent: 'parent',
+    data: {
+      label: 'UPF',
+      type: 'gateway',
+      domain: 'ConnectionNF',
+      description: 'User plane function for data path forwarding.',
+      properties: { 'Role': 'User Plane', 'Status': 'Ready' }
+    },
+  },
+
+  // --- AGENT DOMAIN NODES ---
   {
     id: 'system-agent',
-    parentId: 'group-network',
+    parentId: 'group-agent',
     type: 'architectureNode',
-    position: { x: 280, y: 210 },
+    position: { x: 40, y: 180 },
     extent: 'parent',
     data: { 
       label: 'System Agent', 
       type: 'agent',
-      domain: 'Network',
+      domain: 'Agent',
       description: 'The master orchestrator analyzing intent and routing to specialized skill agents.',
       properties: { 'LLM': 'Active', 'Role': 'Orchestrator' }
     },
   },
   {
     id: 'conn-agent',
-    parentId: 'group-network',
+    parentId: 'group-agent',
     type: 'architectureNode',
-    position: { x: 520, y: 60 },
+    position: { x: 280, y: 60 },
     extent: 'parent',
     data: { 
       label: 'ConnAgent / AAIHF', 
       type: 'agent',
-      domain: 'Network',
+      domain: 'Agent',
       description: 'Specialized agent for managing secure connectivity and subnet onboarding.',
       properties: { 'Capability': 'Networking', 'Status': 'Ready' }
     },
   },
   {
     id: 'compute-agent',
-    parentId: 'group-network',
+    parentId: 'group-agent',
     type: 'architectureNode',
-    position: { x: 520, y: 210 },
+    position: { x: 280, y: 180 },
     extent: 'parent',
     data: { 
       label: 'Compute Agent', 
       type: 'agent',
-      domain: 'Network',
+      domain: 'Agent',
       description: 'Agent focused on computational task offloading and resource placement.',
       properties: { 'Capability': 'Compute', 'Status': 'Ready' }
     },
   },
   {
     id: 'sense-agent',
-    parentId: 'group-network',
+    parentId: 'group-agent',
     type: 'architectureNode',
-    position: { x: 520, y: 360 },
+    position: { x: 280, y: 300 },
     extent: 'parent',
     data: { 
       label: 'Sense Agent', 
       type: 'agent',
-      domain: 'Network',
+      domain: 'Agent',
       description: 'Agent specialized in environmental sensing and data acquisition.',
       properties: { 'Capability': 'Sensing', 'Status': 'Ready' }
     },
   },
   {
     id: 'acrf',
-    parentId: 'group-network',
+    parentId: 'group-agent',
     type: 'architectureNode',
-    position: { x: 780, y: 210 },
+    position: { x: 560, y: 180 },
     extent: 'parent',
     data: { 
       label: 'ACRF', 
       type: 'registry',
-      domain: 'Network',
+      domain: 'Agent',
       description: 'Agent Capability Repository Function. Stores skill definitions and embeddings.',
       properties: { 'Opt1': 'LLM Thinking', 'Opt2': 'Vector Store' }
     },
   },
   {
     id: 'igw',
-    parentId: 'group-network',
+    parentId: 'group-agent',
     type: 'architectureNode',
-    position: { x: 780, y: 380 },
+    position: { x: 560, y: 320 },
     extent: 'parent',
     data: { 
       label: 'IGW', 
       type: 'gateway',
-      domain: 'Network',
+      domain: 'Agent',
       description: 'Intelligence Gateway. Registers new skills and agents into the ACRF.',
       properties: { 'Action': 'RegisterSkill', 'Auth': 'Verified' }
     },
@@ -208,38 +223,6 @@ export const ARCHITECTURE_NODES: Node[] = [
 ];
 
 export const ARCHITECTURE_EDGES = [
-  // App -> SystemAgent via NEF
-  { id: 'e-app-nef', source: 'app-layer', target: 'nef' },
-  { id: 'e-nef-sa', source: 'nef', target: 'system-agent', animated: true },
-
   // UE -> SystemAgent via SRF
   { id: 'e-phone-srf', source: 'ue-phone', target: 'srf' },
-  { id: 'e-robot-srf', source: 'ue-robot', target: 'srf' },
-  { id: 'e-glasses-srf', source: 'ue-glasses', target: 'srf' },
-  { id: 'e-srf-sa', source: 'srf', target: 'system-agent', animated: true },
-
-  // SystemAgent -> Specialized Agents
-  { id: 'e-sa-conn', source: 'system-agent', target: 'conn-agent' },
-  { id: 'e-sa-compute', source: 'system-agent', target: 'compute-agent' },
-  { id: 'e-sa-sense', source: 'system-agent', target: 'sense-agent' },
-
-  // Specialized Agents -> ACRF (SearchSkill)
-  { 
-    id: 'e-conn-acrf', source: 'conn-agent', target: 'acrf', 
-    label: 'SearchSkill', markerEnd: { type: MarkerType.ArrowClosed } 
-  },
-  { 
-    id: 'e-compute-acrf', source: 'compute-agent', target: 'acrf', 
-    label: 'SearchSkill', markerEnd: { type: MarkerType.ArrowClosed } 
-  },
-  { 
-    id: 'e-sense-acrf', source: 'sense-agent', target: 'acrf', 
-    label: 'SearchSkill', markerEnd: { type: MarkerType.ArrowClosed } 
-  },
-
-  // IGW -> ACRF (RegisterSkill)
-  { 
-    id: 'e-igw-acrf', source: 'igw', target: 'acrf', 
-    label: 'RegisterSkill', markerEnd: { type: MarkerType.ArrowClosed } 
-  },
 ];

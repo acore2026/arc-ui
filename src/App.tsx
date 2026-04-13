@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Workspace from './app/Workspace';
 import ExecutionPage from './app/ExecutionPage';
 import ArchitecturePage from './app/ArchitecturePage';
@@ -17,7 +17,8 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<ArchitecturePage />} />
+        <Route path="/" element={<Navigate to="/architecture" replace />} />
+        <Route path="/architecture" element={<ArchitecturePage />} />
         <Route path="/workshop" element={<Workspace />} />
         <Route path="/execution" element={<ExecutionPage />} />
       </Routes>
