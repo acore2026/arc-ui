@@ -1,64 +1,124 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
+  Background,
   Controls,
-  ReactFlow,
   Handle,
+  NodeResizer,
   Position,
-  useNodesState,
+  ReactFlow,
+  useNodesInitialized,
+  useReactFlow,
   useEdgesState,
-  type Node,
+  useNodesState,
+  type Edge,
 } from '@xyflow/react';
-import { 
-  Cpu, Database, Router, Shield, 
-  Smartphone, Bot, Info, X, Globe, Layout
+import {
+  Bot,
+  CircleDot,
+  Cpu,
+  Database,
+  Globe2,
+  Route,
+  Shield,
+  Smartphone,
+  Waypoints,
+  Zap,
 } from 'lucide-react';
-import { ARCHITECTURE_NODES, ARCHITECTURE_EDGES, type ArchitectureNodeData } from '../../lib/architectureData';
+import {
+  ARCHITECTURE_EDGES,
+  ARCHITECTURE_NODES,
+  type ArchitectureEdgeData,
+  type ArchitectureNodeData,
+} from '../../lib/architectureData';
 import '@xyflow/react/dist/style.css';
 import './ArchitectureGraph.css';
 
-// --- CUSTOM NODE COMPONENT ---
-
 const NodeIcon: React.FC<{ type: ArchitectureNodeData['type'] }> = ({ type }) => {
   switch (type) {
-    case 'ue': 
+    case 'phone':
       return <Smartphone size={18} />;
-    case 'app': return <Layout size={18} />;
-    case 'ran': return <Router size={18} />;
-    case 'core': return <Cpu size={18} />;
-    case 'registry': return <Database size={18} />;
-    case 'agent': return <Bot size={18} />;
-    case 'gateway': return <Globe size={18} />;
-    case 'policy': return <Shield size={18} />;
-    default: return <Shield size={18} />;
+    case 'srf':
+      return <Waypoints size={18} />;
+    case 'agent':
+      return <Bot size={18} />;
+    case 'registry':
+      return <Database size={18} />;
+    case 'gateway':
+      return <Globe2 size={18} />;
+    case 'nf':
+      return <Cpu size={18} />;
+    case 'domain':
+      return <CircleDot size={14} />;
+    default:
+      return <Shield size={18} />;
   }
 };
 
 const ArchitectureNode: React.FC<{ data: ArchitectureNodeData; selected?: boolean }> = ({ data, selected }) => {
   if (data.type === 'domain') {
-    const domainIcon = data.domain === 'Device' ? <Smartphone size={14} /> : data.domain === 'App' ? <Layout size={14} /> : <Globe size={14} />;
-
     return (
-      <div className="arch-domain-label-container">
-        {!data.hideTitle && (
-          <div className="arch-domain-header">
-            {domainIcon}
-            <span>{data.label}</span>
-          </div>
-        )}
+      <div className={`arch-domain-label arch-domain-${String(data.domain).toLowerCase().replaceAll(' ', '-')}`}>
+        <NodeResizer
+          isVisible={Boolean(selected)}
+          minWidth={190}
+          minHeight={160}
+          lineStyle={{ borderColor: '#38bdf8', borderWidth: 1 }}
+          handleStyle={{ width: 10, height: 10, borderRadius: 8, border: '2px solid #fff', background: '#0ea5e9' }}
+        />
+        <div className="arch-domain-title">
+          <NodeIcon type={data.type} />
+          <span>{data.label}</span>
+        </div>
+        {data.subtitle && <div className="arch-domain-subtitle">{data.subtitle}</div>}
       </div>
     );
   }
 
+  const isPillNode = data.type === 'phone' || data.type === 'srf' || (data.type === 'gateway' && data.label === 'IGW');
+
   return (
-    <div className={`arch-node arch-node-${data.type} ${selected ? 'is-selected' : ''}`}>
-      <Handle type="target" position={Position.Left} style={{ visibility: 'hidden' }} />
-      <Handle type="target" position={Position.Top} style={{ visibility: 'hidden' }} />
-      <div className="arch-node-icon">
-        <NodeIcon type={data.type} />
+    <div className={`arch-node arch-node-${data.type} ${isPillNode ? 'arch-node-pill' : ''} ${selected ? 'is-selected' : ''}`}>
+      <Handle type="target" position={Position.Left} className="arch-card-handle" />
+      <div className="arch-node-heading">
+        <div className="arch-node-icon">
+          <NodeIcon type={data.type} />
+        </div>
+        <div className="arch-node-copy">
+          <div className="arch-node-label">{data.label}</div>
+          {data.subtitle && <div className="arch-node-subtitle">{data.subtitle}</div>}
+        </div>
       </div>
-      <div className="arch-node-label">{data.label}</div>
-      <Handle type="source" position={Position.Right} style={{ visibility: 'hidden' }} />
-      <Handle type="source" position={Position.Bottom} style={{ visibility: 'hidden' }} />
+
+      {data.skills && (
+        <div className="arch-skill-list" aria-label={`${data.label} skills`}>
+          {data.skills.map((skill) => (
+            <span key={skill.id} className="arch-skill-pill">
+              {skill.label}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {data.tools && (
+        <div className="arch-tool-list" aria-label={`${data.label} tools`}>
+          {data.tools.map((tool) => (
+            <div key={tool.id} className="arch-tool-pill">
+              <Handle
+                id={`tool-${tool.id}`}
+                type="target"
+                position={Position.Left}
+                className="arch-tool-handle"
+              />
+              <span>{tool.label}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <Handle type="source" position={Position.Right} className="arch-card-handle arch-card-source" />
+      {(data.type === 'agent' || data.type === 'gateway') && (
+        <Handle id="tool-source" type="source" position={Position.Bottom} className="arch-card-handle arch-tool-source" />
+      )}
     </div>
   );
 };
@@ -67,104 +127,135 @@ const nodeTypes = {
   architectureNode: ArchitectureNode,
 };
 
-// --- MAIN COMPONENT ---
+const AutoFitViewport: React.FC = () => {
+  const { fitView } = useReactFlow();
+  const nodesReady = useNodesInitialized();
+
+  useEffect(() => {
+    if (!nodesReady) {
+      return;
+    }
+
+    const refit = () => {
+      void fitView({
+        padding: 0.08,
+        duration: 180,
+      });
+    };
+
+    refit();
+    window.addEventListener('resize', refit);
+    return () => window.removeEventListener('resize', refit);
+  }, [fitView, nodesReady]);
+
+  return null;
+};
 
 const ArchitectureGraph: React.FC = () => {
+  const defaultEdges = useMemo<Edge<ArchitectureEdgeData>[]>(() => {
+    return ARCHITECTURE_EDGES.map((edge) => {
+      const kind = edge.data?.kind ?? 'ingress';
+
+      return {
+        ...edge,
+        className: ['arch-edge', `arch-edge-${kind}`].join(' '),
+      };
+    });
+  }, []);
   const [nodes, , onNodesChange] = useNodesState(ARCHITECTURE_NODES);
-  const [edges, , onEdgesChange] = useEdgesState(ARCHITECTURE_EDGES);
-  const [selectedNode, setSelectedNode] = useState<ArchitectureNodeData | null>(null);
-  const [exportStatus, setExportStatus] = useState('Export positions');
+  const [edges, , onEdgesChange] = useEdgesState(defaultEdges);
+  const [exportLabel, setExportLabel] = useState('Export layout');
 
-  const onNodeClick = (_: React.MouseEvent, node: Node) => {
-    setSelectedNode(node.data as unknown as ArchitectureNodeData);
-  };
+  const handleExportLayout = () => {
+    const payload = nodes.map((node) => {
+      const style = node.style as Record<string, unknown> | undefined;
+      const width = typeof style?.width === 'number' ? style.width : node.width;
+      const height = typeof style?.height === 'number' ? style.height : node.height;
 
-  const onPaneClick = () => {
-    setSelectedNode(null);
-  };
-
-  const handleExportPositions = () => {
-    const positions = nodes
-      .filter((node) => (node.data as unknown as ArchitectureNodeData).type !== 'domain')
-      .map((node) => ({
+      return {
         id: node.id,
-        label: (node.data as unknown as ArchitectureNodeData).label,
+        label: node.data.label,
+        type: node.data.type,
         parentId: node.parentId ?? null,
         position: node.position,
-      }));
+        ...(node.data.type === 'domain' ? { size: { width, height } } : {}),
+      };
+    });
 
-    const blob = new Blob([`${JSON.stringify(positions, null, 2)}\n`], { type: 'application/json' });
+    const blob = new Blob([`${JSON.stringify(payload, null, 2)}\n`], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'architecture-card-positions.json';
+    link.download = 'topology-layout.json';
     link.click();
     URL.revokeObjectURL(url);
-
-    setExportStatus('Exported');
-    window.setTimeout(() => setExportStatus('Export positions'), 1400);
+    setExportLabel('Exported');
+    window.setTimeout(() => setExportLabel('Export layout'), 1200);
   };
 
   return (
-    <div className="arch-graph-container">
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        nodeTypes={nodeTypes}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onNodeClick={onNodeClick}
-        onPaneClick={onPaneClick}
-        fitView
-        fitViewOptions={{ padding: 0.05 }}
-        minZoom={0.5}
-        maxZoom={2}
-        defaultEdgeOptions={{ 
-          type: 'simplebezier',
-          style: { strokeWidth: 1.6, stroke: '#d1d5db' }
-        }}
-      >
-        <Controls showInteractive={false} />
-      </ReactFlow>
-
-      <button type="button" className="arch-export-button" onClick={handleExportPositions}>
-        {exportStatus}
-      </button>
-
-      {/* INSPECTOR OVERLAY */}
-      {selectedNode && (
-        <div className="arch-inspector">
-          <div className="arch-inspector-header">
-            <div className="arch-inspector-title">
-              <NodeIcon type={selectedNode.type} />
-              <span>{selectedNode.label}</span>
-            </div>
-            <button onClick={() => setSelectedNode(null)} className="arch-inspector-close">
-              <X size={14} />
-            </button>
+    <div className="arch-demo">
+      <header className="arch-topbar">
+        <div className="arch-brand">
+          <div className="arch-brand-mark">
+            <Zap size={18} />
           </div>
-          <div className="arch-inspector-body">
-            <p className="arch-inspector-desc">{selectedNode.description}</p>
-            {selectedNode.properties && (
-              <div className="arch-properties">
-                <div className="arch-properties-header">
-                  <Info size={12} />
-                  <span>Attributes</span>
-                </div>
-                <div className="arch-properties-grid">
-                  {Object.entries(selectedNode.properties).map(([key, val]) => (
-                    <React.Fragment key={key}>
-                      <div className="arch-prop-key">{key}</div>
-                      <div className="arch-prop-val">{val}</div>
-                    </React.Fragment>
-                  ))}
-                </div>
-              </div>
-            )}
+          <div>
+            <h1>Agentic Core Topology</h1>
+            <p>Skill discovery and NF tool-call sandbox</p>
           </div>
         </div>
-      )}
 
+        <div className="arch-scenario-pill">
+          <span>Topology sandbox</span>
+          ACRF discovers skills. Agents call NF tool handles.
+        </div>
+
+        <div className="arch-legend">
+          <span className="arch-legend-item is-discovery">Skills</span>
+          <span className="arch-legend-item is-tool">Tool handles</span>
+          <span className="arch-legend-item is-handoff">Agent handoff</span>
+          <button type="button" className="arch-export-button" onClick={handleExportLayout}>
+            {exportLabel}
+          </button>
+        </div>
+      </header>
+
+      <main className="arch-layout">
+        <section className="arch-canvas-shell" aria-label="Agentic topology sandbox">
+          <div className="arch-canvas-header">
+            <div>
+              <div className="arch-eyebrow">Topology</div>
+              <h2>Readable topology foundation for discovery and tool invocation</h2>
+            </div>
+            <div className="arch-static-badge">
+              <Route size={14} />
+              Static sandbox
+            </div>
+          </div>
+
+          <div className="arch-flow-wrap">
+            <ReactFlow
+              nodes={nodes}
+              edges={edges}
+              nodeTypes={nodeTypes}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              fitView
+              fitViewOptions={{ padding: 0.08 }}
+              minZoom={0.45}
+              maxZoom={1.35}
+              nodesDraggable
+              nodesConnectable={false}
+              elementsSelectable
+            >
+              <Background color="#dbeafe" gap={28} size={1} />
+              <Controls showInteractive={false} />
+              <AutoFitViewport />
+            </ReactFlow>
+          </div>
+        </section>
+      </main>
     </div>
   );
 };

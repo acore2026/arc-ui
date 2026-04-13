@@ -1,228 +1,307 @@
-import type { Node } from '@xyflow/react';
+import type { Edge, Node } from '@xyflow/react';
 
-export interface ArchitectureNodeData {
+export type ArchitectureNodeType = 'phone' | 'srf' | 'agent' | 'registry' | 'gateway' | 'nf' | 'domain';
+export type ArchitectureDomain = 'Device' | 'Ingress' | 'Agent Runtime' | 'Discovery' | 'NF Tool Domain';
+export type EdgeKind = 'ingress' | 'handoff' | 'discovery' | 'tool-call';
+
+export interface ArchitectureTool {
+  id: string;
   label: string;
-  type: 'ue' | 'app' | 'agent' | 'core' | 'registry' | 'gateway' | 'domain' | 'ran' | 'policy';
-  domain?: 'Device' | 'Network' | 'App' | 'Agent' | 'ConnectionNF';
-  hideTitle?: boolean;
-  description?: string;
-  properties?: Record<string, string>;
 }
 
-export const ARCHITECTURE_NODES: Node[] = [
-  // --- DOMAIN GROUPS (Parent Nodes) ---
+export interface ArchitectureSkill {
+  id: string;
+  label: string;
+}
+
+export interface ArchitectureNodeData extends Record<string, unknown> {
+  label: string;
+  type: ArchitectureNodeType;
+  domain?: ArchitectureDomain;
+  subtitle?: string;
+  description?: string;
+  skills?: ArchitectureSkill[];
+  tools?: ArchitectureTool[];
+}
+
+export interface ArchitectureEdgeData extends Record<string, unknown> {
+  kind: EdgeKind;
+}
+
+const groupStyle = (width: number, height: number, border: string, background: string) => ({
+  width,
+  height,
+  border,
+  background,
+  borderRadius: 8,
+});
+
+export const ARCHITECTURE_NODES: Node<ArchitectureNodeData>[] = [
   {
     id: 'group-device',
     type: 'architectureNode',
-    position: { x: 20, y: 20 },
-    style: { width: 260, height: 180, backgroundColor: 'rgba(240, 253, 250, 0.55)', border: '2px dashed #99f6e4', borderRadius: '8px' },
-    data: { label: 'DEVICE DOMAIN', type: 'domain', domain: 'Device' },
+    position: { x: 20, y: 220 },
+    style: groupStyle(190, 170, '1px solid rgba(45, 212, 191, 0.36)', 'rgba(240, 253, 250, 0.64)'),
+    data: { label: 'Device', type: 'domain', domain: 'Device', subtitle: 'Request origin' },
   },
   {
     id: 'group-agent',
     type: 'architectureNode',
-    position: { x: 520, y: 20 },
-    style: { width: 740, height: 470, backgroundColor: 'rgba(245, 243, 255, 0.38)', border: '2px dashed #ddd6fe', borderRadius: '8px' },
-    data: { label: 'AGENT DOMAIN', type: 'domain', domain: 'Agent', hideTitle: true },
+    position: { x: 460, y: 120 },
+    style: groupStyle(620, 360, '1px solid rgba(168, 85, 247, 0.28)', 'rgba(250, 245, 255, 0.46)'),
+    data: { label: 'Agent Runtime', type: 'domain', domain: 'Agent Runtime', subtitle: 'Decision layer' },
   },
   {
-    id: 'group-connection-nf',
+    id: 'group-discovery',
     type: 'architectureNode',
-    position: { x: 20, y: 260 },
-    style: { width: 440, height: 300, backgroundColor: 'rgba(236, 253, 245, 0.38)', border: '2px dashed #bbf7d0', borderRadius: '8px' },
-    data: { label: 'CONNECTION NF DOMAIN', type: 'domain', domain: 'ConnectionNF', hideTitle: true },
+    position: { x: 1120, y: 168 },
+    style: groupStyle(260, 260, '1px solid rgba(245, 158, 11, 0.34)', 'rgba(255, 251, 235, 0.6)'),
+    data: { label: 'Discovery', type: 'domain', domain: 'Discovery', subtitle: 'Skill registry' },
   },
-
-  // --- DEVICE DOMAIN NODES ---
   {
-    id: 'ue-phone',
+    id: 'group-nf',
+    type: 'architectureNode',
+    position: { x: 1420, y: 70 },
+    style: groupStyle(300, 600, '1px solid rgba(14, 165, 233, 0.28)', 'rgba(240, 249, 255, 0.5)'),
+    data: { label: 'NF Tool Domain', type: 'domain', domain: 'NF Tool Domain', subtitle: 'Callable tool providers' },
+  },
+  {
+    id: 'phone',
     parentId: 'group-device',
     type: 'architectureNode',
-    position: { x: 80, y: 40 },
+    position: { x: 38, y: 58 },
     extent: 'parent',
-    data: { 
-      label: 'Phone', 
-      type: 'ue',
+    data: {
+      label: 'Phone',
+      type: 'phone',
       domain: 'Device',
-      description: 'Standard smartphone with 6G capabilities.',
-      properties: { 'ID': 'SUCI_P001', 'Status': 'Active' }
+      subtitle: 'Sensing request',
+      description: 'Originates the service request and receives the final response.',
     },
   },
-
-  // --- TOP-LEFT NETWORK ACCESS NODE ---
   {
     id: 'srf',
     type: 'architectureNode',
-    position: { x: 320, y: 70 },
-    data: { 
-      label: 'SRF', 
-      type: 'core',
-      domain: 'Network',
-      description: 'Service Routing Function. Connects user equipment to the network intelligence layer.',
-      properties: { 'Latency': '<0.5ms', 'Protocol': '6G-S' }
-    },
-  },
-
-  // --- CONNECTION NF DOMAIN NODES ---
-  {
-    id: 'amf',
-    parentId: 'group-connection-nf',
-    type: 'architectureNode',
-    position: { x: 40, y: 60 },
-    extent: 'parent',
+    position: { x: 250, y: 266 },
     data: {
-      label: 'AMF',
-      type: 'core',
-      domain: 'ConnectionNF',
-      description: 'Access and mobility function for connection session control.',
-      properties: { 'Role': 'Access', 'Status': 'Ready' }
+      label: 'SRF',
+      type: 'srf',
+      domain: 'Ingress',
+      subtitle: 'Request normalizer',
+      description: 'Normalizes the user request before it enters the agent runtime.',
     },
   },
-  {
-    id: 'smf',
-    parentId: 'group-connection-nf',
-    type: 'architectureNode',
-    position: { x: 170, y: 60 },
-    extent: 'parent',
-    data: {
-      label: 'SMF',
-      type: 'core',
-      domain: 'ConnectionNF',
-      description: 'Session management function for connection setup.',
-      properties: { 'Role': 'Session', 'Status': 'Ready' }
-    },
-  },
-  {
-    id: 'pcf',
-    parentId: 'group-connection-nf',
-    type: 'architectureNode',
-    position: { x: 300, y: 60 },
-    extent: 'parent',
-    data: {
-      label: 'PCF',
-      type: 'policy',
-      domain: 'ConnectionNF',
-      description: 'Policy control function for connection policy decisions.',
-      properties: { 'Role': 'Policy', 'Status': 'Ready' }
-    },
-  },
-  {
-    id: 'db',
-    parentId: 'group-connection-nf',
-    type: 'architectureNode',
-    position: { x: 105, y: 180 },
-    extent: 'parent',
-    data: {
-      label: 'DB',
-      type: 'registry',
-      domain: 'ConnectionNF',
-      description: 'Connection-state and subscriber data store.',
-      properties: { 'Role': 'Store', 'Status': 'Ready' }
-    },
-  },
-  {
-    id: 'upf',
-    parentId: 'group-connection-nf',
-    type: 'architectureNode',
-    position: { x: 235, y: 180 },
-    extent: 'parent',
-    data: {
-      label: 'UPF',
-      type: 'gateway',
-      domain: 'ConnectionNF',
-      description: 'User plane function for data path forwarding.',
-      properties: { 'Role': 'User Plane', 'Status': 'Ready' }
-    },
-  },
-
-  // --- AGENT DOMAIN NODES ---
   {
     id: 'system-agent',
     parentId: 'group-agent',
     type: 'architectureNode',
-    position: { x: 40, y: 180 },
+    position: { x: 42, y: 136 },
     extent: 'parent',
-    data: { 
-      label: 'System Agent', 
+    data: {
+      label: 'System Agent',
       type: 'agent',
-      domain: 'Agent',
-      description: 'The master orchestrator analyzing intent and routing to specialized skill agents.',
-      properties: { 'LLM': 'Active', 'Role': 'Orchestrator' }
+      domain: 'Agent Runtime',
+      subtitle: 'Dispatcher',
+      description: 'Classifies the task and routes work to specialized agents.',
     },
   },
   {
-    id: 'conn-agent',
+    id: 'connection-agent',
     parentId: 'group-agent',
     type: 'architectureNode',
-    position: { x: 280, y: 60 },
+    position: { x: 250, y: 66 },
     extent: 'parent',
-    data: { 
-      label: 'ConnAgent / AAIHF', 
+    data: {
+      label: 'Connection Agent',
       type: 'agent',
-      domain: 'Agent',
-      description: 'Specialized agent for managing secure connectivity and subnet onboarding.',
-      properties: { 'Capability': 'Networking', 'Status': 'Ready' }
+      domain: 'Agent Runtime',
+      subtitle: 'Connectivity prep',
+      description: 'Handles connectivity preparation before the sensing service runs.',
     },
   },
   {
     id: 'compute-agent',
     parentId: 'group-agent',
     type: 'architectureNode',
-    position: { x: 280, y: 180 },
+    position: { x: 442, y: 66 },
     extent: 'parent',
-    data: { 
-      label: 'Compute Agent', 
+    data: {
+      label: 'Compute Agent',
       type: 'agent',
-      domain: 'Agent',
-      description: 'Agent focused on computational task offloading and resource placement.',
-      properties: { 'Capability': 'Compute', 'Status': 'Ready' }
+      domain: 'Agent Runtime',
+      subtitle: 'Compute support',
+      description: 'Represents compute support when a service needs placement or resources.',
     },
   },
   {
     id: 'sense-agent',
     parentId: 'group-agent',
     type: 'architectureNode',
-    position: { x: 280, y: 300 },
+    position: { x: 250, y: 234 },
     extent: 'parent',
-    data: { 
-      label: 'Sense Agent', 
+    data: {
+      label: 'Sense Agent',
       type: 'agent',
-      domain: 'Agent',
-      description: 'Agent specialized in environmental sensing and data acquisition.',
-      properties: { 'Capability': 'Sensing', 'Status': 'Ready' }
-    },
-  },
-  {
-    id: 'acrf',
-    parentId: 'group-agent',
-    type: 'architectureNode',
-    position: { x: 560, y: 180 },
-    extent: 'parent',
-    data: { 
-      label: 'ACRF', 
-      type: 'registry',
-      domain: 'Agent',
-      description: 'Agent Capability Repository Function. Stores skill definitions and embeddings.',
-      properties: { 'Opt1': 'LLM Thinking', 'Opt2': 'Vector Store' }
+      domain: 'Agent Runtime',
+      subtitle: 'Sensing workflow',
+      description: 'Handles the sensing-specific part of the request.',
     },
   },
   {
     id: 'igw',
     parentId: 'group-agent',
     type: 'architectureNode',
-    position: { x: 560, y: 320 },
+    position: { x: 442, y: 234 },
     extent: 'parent',
-    data: { 
-      label: 'IGW', 
+    data: {
+      label: 'IGW',
       type: 'gateway',
-      domain: 'Agent',
-      description: 'Intelligence Gateway. Registers new skills and agents into the ACRF.',
-      properties: { 'Action': 'RegisterSkill', 'Auth': 'Verified' }
+      domain: 'Agent Runtime',
+      subtitle: 'Invocation bridge',
+      description: 'Bridges selected capability calls into concrete tool invocation.',
+    },
+  },
+  {
+    id: 'acrf',
+    parentId: 'group-discovery',
+    type: 'architectureNode',
+    position: { x: 42, y: 38 },
+    extent: 'parent',
+    data: {
+      label: 'ACRF',
+      type: 'registry',
+      domain: 'Discovery',
+      subtitle: 'Capability registry',
+      description: 'Indexes capabilities and returns matching skills. It is not an executor.',
+      skills: [
+        { id: 'network-prepare', label: 'network.prepare-session' },
+        { id: 'sensing-context', label: 'sensing.execute-with-context' },
+        { id: 'compute-reserve', label: 'compute.reserve' },
+        { id: 'policy-match', label: 'policy.match' },
+      ],
+    },
+  },
+  {
+    id: 'am',
+    parentId: 'group-nf',
+    type: 'architectureNode',
+    position: { x: 34, y: 44 },
+    extent: 'parent',
+    data: {
+      label: 'AM',
+      type: 'nf',
+      domain: 'NF Tool Domain',
+      subtitle: 'Access',
+      description: 'Provides access and session-admission tools.',
+      tools: [
+        { id: 'prepare-access', label: 'prepareAccess' },
+        { id: 'admit-device', label: 'admitDevice' },
+      ],
+    },
+  },
+  {
+    id: 'sm',
+    parentId: 'group-nf',
+    type: 'architectureNode',
+    position: { x: 34, y: 146 },
+    extent: 'parent',
+    data: {
+      label: 'SM',
+      type: 'nf',
+      domain: 'NF Tool Domain',
+      subtitle: 'Session',
+      description: 'Provides session context and setup tools.',
+      tools: [
+        { id: 'setup-session', label: 'setupSession' },
+        { id: 'bind-context', label: 'bindContext' },
+      ],
+    },
+  },
+  {
+    id: 'policy',
+    parentId: 'group-nf',
+    type: 'architectureNode',
+    position: { x: 34, y: 248 },
+    extent: 'parent',
+    data: {
+      label: 'Policy',
+      type: 'nf',
+      domain: 'NF Tool Domain',
+      subtitle: 'Decision',
+      description: 'Provides policy and resource decision tools.',
+      tools: [
+        { id: 'evaluate-policy', label: 'evaluatePolicy' },
+        { id: 'select-profile', label: 'selectProfile' },
+      ],
+    },
+  },
+  {
+    id: 'db',
+    parentId: 'group-nf',
+    type: 'architectureNode',
+    position: { x: 34, y: 350 },
+    extent: 'parent',
+    data: {
+      label: 'DB',
+      type: 'nf',
+      domain: 'NF Tool Domain',
+      subtitle: 'State lookup',
+      description: 'Provides profile and context lookup tools.',
+      tools: [
+        { id: 'lookup-profile', label: 'lookupProfile' },
+      ],
+    },
+  },
+  {
+    id: 'up',
+    parentId: 'group-nf',
+    type: 'architectureNode',
+    position: { x: 34, y: 452 },
+    extent: 'parent',
+    data: {
+      label: 'UP',
+      type: 'nf',
+      domain: 'NF Tool Domain',
+      subtitle: 'Forwarding',
+      description: 'Provides execution and forwarding-related tools.',
+      tools: [
+        { id: 'prepare-forwarding', label: 'prepareForwarding' },
+        { id: 'execute-sensing', label: 'executeSensingTask' },
+      ],
     },
   },
 ];
 
-export const ARCHITECTURE_EDGES = [
-  // UE -> SystemAgent via SRF
-  { id: 'e-phone-srf', source: 'ue-phone', target: 'srf' },
+const edge = (
+  id: string,
+  source: string,
+  target: string,
+  kind: EdgeKind,
+  targetHandle?: string,
+  sourceHandle?: string,
+): Edge<ArchitectureEdgeData> => ({
+  id,
+  source,
+  target,
+  sourceHandle,
+  targetHandle,
+  type: 'smoothstep',
+  data: { kind },
+});
+
+export const ARCHITECTURE_EDGES: Edge<ArchitectureEdgeData>[] = [
+  edge('phone-srf', 'phone', 'srf', 'ingress'),
+  edge('srf-system', 'srf', 'system-agent', 'ingress'),
+  edge('system-connection', 'system-agent', 'connection-agent', 'handoff'),
+  edge('system-sense', 'system-agent', 'sense-agent', 'handoff'),
+  edge('sense-igw', 'sense-agent', 'igw', 'handoff'),
+  edge('connection-acrf', 'connection-agent', 'acrf', 'discovery'),
+  edge('compute-acrf', 'compute-agent', 'acrf', 'discovery'),
+  edge('sense-acrf', 'sense-agent', 'acrf', 'discovery'),
+  edge('connection-am-prepare', 'connection-agent', 'am', 'tool-call', 'tool-prepare-access', 'tool-source'),
+  edge('connection-sm-setup', 'connection-agent', 'sm', 'tool-call', 'tool-setup-session', 'tool-source'),
+  edge('connection-policy-evaluate', 'connection-agent', 'policy', 'tool-call', 'tool-evaluate-policy', 'tool-source'),
+  edge('connection-db-profile', 'connection-agent', 'db', 'tool-call', 'tool-lookup-profile', 'tool-source'),
+  edge('connection-up-forwarding', 'connection-agent', 'up', 'tool-call', 'tool-prepare-forwarding', 'tool-source'),
+  edge('igw-up-sensing', 'igw', 'up', 'tool-call', 'tool-execute-sensing', 'tool-source'),
 ];

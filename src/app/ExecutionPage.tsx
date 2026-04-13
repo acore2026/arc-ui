@@ -37,12 +37,43 @@ interface Packet {
   };
 }
 
-type WebSocketMessageType = 'ai_payload' | 'llm_thought' | 'network_pcap' | 'workflow_complete' | 'routing_decision';
-
-interface WebSocketMessage {
-  type: WebSocketMessageType;
-  data: unknown;
+interface RoutingDecisionMessage {
+  type: 'routing_decision';
+  data: { skillId: string };
 }
+
+interface AIPayloadMessage {
+  type: 'ai_payload';
+  data: { agent: string; role: 'user' | 'assistant'; content: string };
+}
+
+interface LLMThoughtMessage {
+  type: 'llm_thought';
+  data: { agent: string; chunk: string };
+}
+
+interface NetworkPcapMessage {
+  type: 'network_pcap';
+  data: {
+    source: string;
+    destination: string;
+    protocol: string;
+    info: string;
+    details: Packet['details'];
+  };
+}
+
+interface WorkflowCompleteMessage {
+  type: 'workflow_complete';
+  data?: unknown;
+}
+
+type WebSocketMessage =
+  | RoutingDecisionMessage
+  | AIPayloadMessage
+  | LLMThoughtMessage
+  | NetworkPcapMessage
+  | WorkflowCompleteMessage;
 
 const ExecutionPage: React.FC = () => {
   const { setMatchedSkillId, setSkillLibraryOpen } = useStore();
@@ -171,8 +202,6 @@ const ExecutionPage: React.FC = () => {
           break;
         }
 
-        default:
-          console.warn('[WS] Handler: Unknown type:', msg.type);
       }
     } catch (err) {
       console.error('[WS] Error parsing message:', err);
