@@ -6,7 +6,7 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  background: #f8fafc;
+  background: #ffffff;
   color: #0f172a;
   overflow: hidden;
 }
@@ -95,10 +95,232 @@
 .arch-layout {
   flex: 1;
   min-height: 0;
-  display: flex;
-  flex-direction: column;
   padding: 0.75rem;
   position: relative;
+}
+
+.arch-workbench {
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(18rem, 23rem) minmax(0, 1fr);
+  gap: 0.75rem;
+}
+
+.arch-chat-panel {
+  min-height: 0;
+  border: 1px solid rgba(226, 232, 240, 0.96);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.06);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.arch-chat-header {
+  padding: 0.72rem;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.92);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.arch-chat-header span {
+  display: block;
+  color: #64748b;
+  font-size: 0.58rem;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.arch-chat-header h2 {
+  margin: 0.16rem 0 0;
+  color: #0f172a;
+  font-size: 0.92rem;
+  line-height: 1.16;
+}
+
+.arch-chat-header strong {
+  border: 1px solid rgba(20, 184, 166, 0.26);
+  border-radius: 999px;
+  background: rgba(240, 253, 250, 0.96);
+  color: #0f766e;
+  padding: 0.18rem 0.4rem;
+  font-size: 0.58rem;
+  font-weight: 850;
+}
+
+.arch-chat-stream {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0.68rem;
+  display: grid;
+  align-content: start;
+  gap: 0.52rem;
+}
+
+.arch-chat-empty {
+  border: 1px dashed rgba(203, 213, 225, 0.96);
+  border-radius: 8px;
+  padding: 0.72rem;
+  background: #f8fafc;
+}
+
+.arch-chat-empty span,
+.arch-chat-stage span {
+  color: #64748b;
+  font-size: 0.58rem;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.arch-chat-empty p {
+  margin: 0.24rem 0 0;
+  color: #475569;
+  font-size: 0.72rem;
+  line-height: 1.36;
+}
+
+.arch-chat-stage {
+  margin: 0.46rem 0 0.08rem;
+  padding: 0 0 0 0.48rem;
+  border-left: 2px solid rgba(148, 163, 184, 0.7);
+}
+
+.arch-chat-item {
+  max-width: 92%;
+  border: 1px solid rgba(226, 232, 240, 0.94);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.98);
+  padding: 0.58rem;
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.04);
+}
+
+.arch-chat-item.is-active {
+  border-color: rgba(124, 58, 237, 0.42);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1), 0 12px 24px rgba(88, 28, 135, 0.08);
+}
+
+.arch-chat-intent {
+  border-color: rgba(20, 184, 166, 0.3);
+  background: rgba(240, 253, 250, 0.98);
+  justify-self: end;
+}
+
+.arch-chat-tool {
+  border-color: rgba(14, 165, 233, 0.26);
+  background: rgba(240, 249, 255, 0.96);
+  justify-self: stretch;
+  max-width: 100%;
+}
+
+.arch-chat-internal {
+  border-color: rgba(245, 158, 11, 0.34);
+  background: rgba(255, 251, 235, 0.96);
+  justify-self: stretch;
+  max-width: 100%;
+}
+
+.arch-chat-agent-planningagent {
+  background: rgba(245, 243, 255, 0.98);
+  border-color: rgba(124, 58, 237, 0.28);
+}
+
+.arch-chat-agent-connectionagent {
+  background: rgba(240, 249, 255, 0.98);
+  border-color: rgba(14, 165, 233, 0.28);
+}
+
+.arch-chat-agent-user {
+  background: rgba(240, 253, 250, 0.98);
+  border-color: rgba(20, 184, 166, 0.3);
+}
+
+.arch-chat-meta,
+.arch-chat-check-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.42rem;
+}
+
+.arch-chat-meta {
+  align-items: center;
+  color: #64748b;
+  font-size: 0.58rem;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 0.28rem;
+}
+
+.arch-chat-item p {
+  margin: 0;
+  color: #334155;
+  font-size: 0.72rem;
+  line-height: 1.42;
+}
+
+.arch-chat-item > strong,
+.arch-chat-check-row strong {
+  display: block;
+  color: #0f172a;
+  font-size: 0.72rem;
+  line-height: 1.24;
+}
+
+.arch-chat-check {
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 999px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  background: #ffffff;
+  color: #92400e;
+  font-size: 0.56rem;
+  font-weight: 850;
+}
+
+.arch-chat-check.is-complete {
+  border-color: rgba(20, 184, 166, 0.36);
+  background: rgba(240, 253, 250, 0.98);
+  color: #0f766e;
+}
+
+.arch-chat-tool-grid {
+  display: grid;
+  gap: 0.3rem;
+  margin-top: 0.4rem;
+}
+
+.arch-chat-tool-grid div {
+  border: 1px solid rgba(226, 232, 240, 0.88);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.86);
+  padding: 0.36rem;
+}
+
+.arch-chat-tool-grid span {
+  display: block;
+  color: #64748b;
+  font-size: 0.54rem;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.arch-chat-tool-grid p {
+  margin-top: 0.14rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.62rem;
+  word-break: break-word;
 }
 
 .arch-stage-note {
@@ -133,12 +355,16 @@
   flex: 1;
   min-height: 0;
   background:
-    linear-gradient(180deg, rgba(248, 250, 252, 0.88), rgba(255, 255, 255, 0.9)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.86)),
     #ffffff;
 }
 
 .arch-flow-wrap .react-flow {
   z-index: 1;
+}
+
+.arch-flow-wrap .react-flow__node {
+  pointer-events: all;
 }
 
 .arch-flow-wrap .react-flow__controls {
@@ -157,29 +383,52 @@
   height: 100%;
   padding: 0.72rem;
   border-radius: 8px;
-  border: 1px solid rgba(203, 213, 225, 0.78);
-  background: rgba(248, 250, 252, 0.68);
+  border: 1px solid rgba(203, 213, 225, 0.66);
+  background:
+    linear-gradient(rgba(148, 163, 184, 0.13) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.13) 1px, transparent 1px),
+    rgba(255, 255, 255, 0.7);
+  background-size: 1.35rem 1.35rem, 1.35rem 1.35rem, auto;
+  backdrop-filter: blur(12px) saturate(1.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82), 0 12px 28px rgba(15, 23, 42, 0.04);
+  pointer-events: none;
 }
 
 .arch-domain-request--intent {
-  background: rgba(236, 254, 255, 0.42);
+  background:
+    linear-gradient(rgba(8, 145, 178, 0.13) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(8, 145, 178, 0.13) 1px, transparent 1px),
+    rgba(236, 254, 255, 0.4);
+  background-size: 1.35rem 1.35rem, 1.35rem 1.35rem, auto;
   border-color: rgba(8, 145, 178, 0.26);
 }
 
 .arch-domain-agent-layer {
-  background: rgba(245, 243, 255, 0.58);
+  background:
+    linear-gradient(rgba(124, 58, 237, 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(124, 58, 237, 0.12) 1px, transparent 1px),
+    rgba(245, 243, 255, 0.45);
+  background-size: 1.35rem 1.35rem, 1.35rem 1.35rem, auto;
   border-color: rgba(124, 58, 237, 0.24);
 }
 
 .arch-domain-repository-layer,
 .arch-domain-arf {
-  background: rgba(255, 251, 235, 0.72);
+  background:
+    linear-gradient(rgba(245, 158, 11, 0.14) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(245, 158, 11, 0.14) 1px, transparent 1px),
+    rgba(255, 251, 235, 0.5);
+  background-size: 1.35rem 1.35rem, 1.35rem 1.35rem, auto;
   border-color: rgba(245, 158, 11, 0.3);
 }
 
 .arch-domain-nf-hosted-tools,
 .arch-domain-trf {
-  background: rgba(240, 249, 255, 0.62);
+  background:
+    linear-gradient(rgba(14, 165, 233, 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(14, 165, 233, 0.12) 1px, transparent 1px),
+    rgba(240, 249, 255, 0.48);
+  background-size: 1.35rem 1.35rem, 1.35rem 1.35rem, auto;
   border-color: rgba(14, 165, 233, 0.28);
 }
 
@@ -190,6 +439,26 @@
   font-weight: 850;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+
+.arch-domain-title svg {
+  flex-shrink: 0;
+}
+
+.arch-domain-request--intent .arch-domain-title svg {
+  color: #0891b2;
+}
+
+.arch-domain-agent-layer .arch-domain-title svg {
+  color: #7c3aed;
+}
+
+.arch-domain-arf .arch-domain-title svg {
+  color: #b45309;
+}
+
+.arch-domain-trf .arch-domain-title svg {
+  color: #0284c7;
 }
 
 .arch-domain-subtitle {
@@ -272,6 +541,7 @@
   max-inline-size: 14rem;
   border-color: rgba(245, 158, 11, 0.36);
   background: rgba(255, 251, 235, 0.98);
+  cursor: pointer;
 }
 
 .arch-node-skill .arch-node-icon {
@@ -326,6 +596,26 @@
 .arch-node-nf .arch-node-icon {
   color: #0369a1;
   background: #e0f2fe;
+}
+
+.arch-node-id-am-tools .arch-node-icon {
+  color: #0891b2;
+  background: #cffafe;
+}
+
+.arch-node-id-udm-tools .arch-node-icon {
+  color: #7c3aed;
+  background: #ede9fe;
+}
+
+.arch-node-id-sm-tools .arch-node-icon {
+  color: #0f766e;
+  background: #ccfbf1;
+}
+
+.arch-node-id-up-tools .arch-node-icon {
+  color: #b45309;
+  background: #fef3c7;
 }
 
 .arch-node-nf .arch-node-description {
@@ -397,6 +687,7 @@
   background: rgba(240, 249, 255, 0.86);
   color: #075985;
   transition: border-color 0.24s ease, background 0.24s ease, box-shadow 0.24s ease;
+  cursor: pointer;
 }
 
 .arch-tool-pill.is-active-tool {
@@ -416,7 +707,13 @@
 }
 
 .arch-tool-purpose {
-  display: none;
+  display: block;
+  margin-top: 0.12rem;
+  color: #64748b;
+  font-size: 0.54rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: normal;
 }
 
 .arch-card-handle {
@@ -944,9 +1241,170 @@
   ry: 6;
 }
 
+.arch-detail-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.18);
+}
+
+.arch-detail-panel {
+  width: min(28rem, calc(100vw - 2rem));
+  max-height: min(42rem, calc(100vh - 2rem));
+  overflow: auto;
+  border-radius: 8px;
+  border: 1px solid rgba(203, 213, 225, 0.94);
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 24px 56px rgba(15, 23, 42, 0.2);
+  padding: 0.9rem;
+  color: #0f172a;
+}
+
+.arch-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.arch-detail-header span {
+  display: inline-flex;
+  color: #64748b;
+  font-size: 0.58rem;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.arch-detail-header h2 {
+  margin: 0.16rem 0 0;
+  font-size: 1rem;
+  line-height: 1.18;
+}
+
+.arch-detail-header p,
+.arch-detail-description,
+.arch-detail-parameter p,
+.arch-detail-step p {
+  margin: 0;
+  color: #475569;
+  line-height: 1.42;
+}
+
+.arch-detail-header p {
+  margin-top: 0.18rem;
+  font-size: 0.72rem;
+  font-weight: 750;
+}
+
+.arch-detail-close {
+  border: 1px solid rgba(203, 213, 225, 0.9);
+  border-radius: 8px;
+  background: #ffffff;
+  color: #475569;
+  width: 1.9rem;
+  height: 1.9rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.arch-detail-description {
+  margin-top: 0.78rem;
+  font-size: 0.78rem;
+}
+
+.arch-detail-facts {
+  display: grid;
+  gap: 0.42rem;
+  margin-top: 0.78rem;
+}
+
+.arch-detail-facts div,
+.arch-detail-parameter,
+.arch-detail-step {
+  border: 1px solid rgba(226, 232, 240, 0.92);
+  border-radius: 8px;
+  background: #f8fafc;
+  padding: 0.52rem;
+}
+
+.arch-detail-facts span,
+.arch-detail-parameter span {
+  display: block;
+  color: #64748b;
+  font-size: 0.58rem;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.arch-detail-facts strong,
+.arch-detail-parameter strong {
+  display: block;
+  margin-top: 0.16rem;
+  color: #0f172a;
+  font-size: 0.72rem;
+  line-height: 1.34;
+}
+
+.arch-detail-section {
+  display: grid;
+  gap: 0.44rem;
+  margin-top: 0.82rem;
+}
+
+.arch-detail-section h3 {
+  margin: 0;
+  font-size: 0.72rem;
+  color: #334155;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.arch-detail-parameter p {
+  margin-top: 0.36rem;
+  font-size: 0.7rem;
+}
+
+.arch-detail-step {
+  display: flex;
+  gap: 0.48rem;
+  align-items: flex-start;
+}
+
+.arch-detail-step > span {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: #e0f2fe;
+  color: #0369a1;
+  font-size: 0.62rem;
+  font-weight: 850;
+}
+
+.arch-detail-step p {
+  font-size: 0.72rem;
+}
+
 @media (max-width: 820px) {
   .arch-layout {
     padding: 0.55rem;
+  }
+
+  .arch-workbench {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(12rem, 16rem) minmax(0, 1fr);
   }
 
   .arch-topbar {

@@ -10,6 +10,10 @@ export interface ArchitectureTool {
   purpose: string;
   input?: string;
   output?: string;
+  description?: string;
+  endpoint?: string;
+  method?: string;
+  parameters?: { name: string; type: string; required: boolean; description: string }[];
 }
 
 export interface ArchitectureCapability {
@@ -40,6 +44,19 @@ export interface ArchitectureNodeData extends Record<string, unknown> {
   storyPhase?: string;
   completedArtifacts?: string[];
   activeTools?: string[];
+  currentMessage?: {
+    role: string;
+    name: string;
+    text: string;
+    isTool: boolean;
+    toolName?: string;
+    toolDetails?: { key: string; value: string }[];
+    isSystemAction?: boolean;
+    systemIcon?: string;
+    activeNodeId: string;
+  };
+  onInspectSkill?: (nodeId: string) => void;
+  onInspectTool?: (toolId: string, nodeId: string) => void;
 }
 
 export interface ArchitectureEdgeData extends Record<string, unknown> {
@@ -55,20 +72,20 @@ const groupStyle = (width: number, height: number) => ({
 
 const layout = {
   requestX: 40,
-  requestY: 230,
+  requestY: 270,
   requestW: 240,
   requestH: 330,
   centerX: 340,
   arfY: 24,
-  arfW: 610,
-  arfH: 150,
-  agentY: 220,
-  agentW: 610,
+  arfW: 660,
+  arfH: 210,
+  agentY: 270,
+  agentW: 660,
   agentH: 560,
-  trfX: 1000,
-  trfY: 70,
+  trfX: 1040,
+  trfY: 40,
   trfW: 270,
-  trfH: 650,
+  trfH: 780,
 };
 
 export const ARCHITECTURE_NODES: Node<ArchitectureNodeData>[] = [
@@ -152,42 +169,28 @@ export const ARCHITECTURE_NODES: Node<ArchitectureNodeData>[] = [
     id: 'connection-skill',
     parentId: 'group-repositories',
     type: 'architectureNode',
-    position: { x: 36, y: 58 },
+    position: { x: 40, y: 65 },
     extent: 'parent',
     data: {
-      label: 'Connection Skill',
+      label: 'ACN Skill',
       type: 'skill',
       domain: 'ARF',
-      subtitle: 'Connection assurance',
-      description: 'Maps intent to connection tools.',
+      subtitle: 'Agent connection',
+      description: 'Defines the exact workflow, tools, and shared parameters to connect a new embodied agent into a core network subnet.',
     },
   },
   {
-    id: 'data-skill',
+    id: 'qos-skill',
     parentId: 'group-repositories',
     type: 'architectureNode',
-    position: { x: 230, y: 58 },
+    position: { x: 340, y: 65 },
     extent: 'parent',
     data: {
-      label: 'Data Skill',
+      label: 'QoS Assurance Skill',
       type: 'skill',
       domain: 'ARF',
-      subtitle: 'Data preparation',
-      description: 'Maps intent to data tasks.',
-    },
-  },
-  {
-    id: 'compute-skill',
-    parentId: 'group-repositories',
-    type: 'architectureNode',
-    position: { x: 424, y: 58 },
-    extent: 'parent',
-    data: {
-      label: 'Compute Skill',
-      type: 'skill',
-      domain: 'ARF',
-      subtitle: 'Compute placement',
-      description: 'Maps intent to compute tasks.',
+      subtitle: 'Service Quality',
+      description: 'Dynamic traffic treatment to guarantee strict latency constraints.',
     },
   },
   {
@@ -261,18 +264,69 @@ export const ARCHITECTURE_NODES: Node<ArchitectureNodeData>[] = [
       description: 'Access tools.',
       tools: [
         {
-          id: 'authentication',
-          name: 'Authentication Tool',
-          purpose: 'Verify UE access',
-          input: 'UE identity context',
-          output: 'access decision',
+          id: 'subscription-tool',
+          name: 'Subscription_tool',
+          purpose: 'Verify UE access status',
+          input: 'ue_id, service_type',
+          description: 'Checks the UDM/UDR if the specified UE is allowed to use the requested service type.',
+          endpoint: 'POST /nausf-auth/v1/ue-authentications',
+          parameters: [
+            { name: 'ue_id', type: 'string', required: true, description: 'The SUCI or SUPI of the UE.' },
+            { name: 'service_type', type: 'string', required: true, description: 'The specific network service requested (e.g. SubnetAccess).' }
+          ]
         },
         {
-          id: 'mobility',
-          name: 'Mobility Management Tool',
-          purpose: 'Prepare mobility',
-          input: 'location and policy context',
-          output: 'mobility action',
+          id: 'subnet-context-tool',
+          name: 'Create_Or_Update_Subnet_Context_tool',
+          purpose: 'Prepare subnet context',
+          input: 'ue_id, agent_list',
+          description: 'Initializes or modifies the 6G AM context for a specific subnet, associating allowed agents.',
+          endpoint: 'PUT /namf-comm/v1/ue-contexts/{ue_id}',
+          parameters: [
+            { name: 'ue_id', type: 'string', required: true, description: 'The SUCI or SUPI of the UE.' },
+            { name: 'agent_list', type: 'array', required: false, description: 'List of agent IDs allowed in this context.' },
+            { name: 'subnet_specification', type: 'integer', required: false, description: 'Optional QoS or policy ID.' }
+          ]
+        },
+      ],
+    },
+  },
+  {
+    id: 'udm-tools',
+    parentId: 'group-tools',
+    type: 'architectureNode',
+    position: { x: 36, y: 204 },
+    extent: 'parent',
+    data: {
+      label: '6G UDM',
+      type: 'nf',
+      domain: 'TRF',
+      subtitle: 'Unified data',
+      description: 'Identity and profile tools.',
+      tools: [
+        {
+          id: 'issue-token-tool',
+          name: 'Issue_Access_Token_tool',
+          purpose: 'Issue subnet token',
+          input: 'subnet_id, agent_id',
+          description: 'Generates a signed token authorizing an agent to join the specific subnet.',
+          endpoint: 'POST /nudm-auth/v1/tokens',
+          parameters: [
+            { name: 'subnet_id', type: 'string', required: true, description: 'The target subnet identifier.' },
+            { name: 'agent_id', type: 'string', required: true, description: 'The identity of the embodied agent joining.' }
+          ]
+        },
+        {
+          id: 'validate-token-tool',
+          name: 'Validate_Access_Token_tool',
+          purpose: 'Validate token validity',
+          input: 'agent_id, provided_token',
+          description: 'Validates the signature, scope, and expiry of a previously issued access token.',
+          endpoint: 'POST /nudm-auth/v1/tokens/validate',
+          parameters: [
+            { name: 'agent_id', type: 'string', required: true, description: 'The identity of the token bearer.' },
+            { name: 'provided_token', type: 'object', required: true, description: 'The token object payload to validate.' }
+          ]
         },
       ],
     },
@@ -281,51 +335,26 @@ export const ARCHITECTURE_NODES: Node<ArchitectureNodeData>[] = [
     id: 'sm-tools',
     parentId: 'group-tools',
     type: 'architectureNode',
-    position: { x: 36, y: 204 },
+    position: { x: 36, y: 350 },
     extent: 'parent',
     data: {
       label: '6G SM',
       type: 'nf',
       domain: 'TRF',
-      subtitle: 'Session',
-      description: 'Session tools.',
+      subtitle: 'Session Management',
+      description: 'Session and PDU tools.',
       tools: [
         {
-          id: 'sm-characteristics',
-          name: 'SM Characteristics Tool',
-          purpose: 'Set session profile',
-          input: 'service requirements',
-          output: 'session profile',
-        },
-        {
-          id: 'up-config',
-          name: 'UP Configuration Tool',
-          purpose: 'Prepare UP config',
-          input: 'selected session profile',
-          output: 'UP configuration',
-        },
-      ],
-    },
-  },
-  {
-    id: 'pcf-tools',
-    parentId: 'group-tools',
-    type: 'architectureNode',
-    position: { x: 36, y: 350 },
-    extent: 'parent',
-    data: {
-      label: '6G PCF',
-      type: 'nf',
-      domain: 'TRF',
-      subtitle: 'Policy',
-      description: 'Policy tools.',
-      tools: [
-        {
-          id: 'traffic-treatment',
-          name: 'Traffic Treatment Tool',
-          purpose: 'Select treatment',
-          input: 'intent constraints',
-          output: 'policy decision',
+          id: 'create-pdu-tool',
+          name: 'Create_Subnet_PDUSession_tool',
+          purpose: 'Establish PDU session',
+          input: 'agent_id, subnet_id',
+          description: 'Triggers the Session Management function to establish the actual network path and allocate IP resources for the agent in the specified subnet.',
+          endpoint: 'POST /nsmf-pdusession/v1/sm-contexts',
+          parameters: [
+            { name: 'agent_id', type: 'string', required: true, description: 'The identity of the embodied agent.' },
+            { name: 'subnet_id', type: 'string', required: true, description: 'The identifier of the subnet context.' }
+          ]
         },
       ],
     },
@@ -334,32 +363,31 @@ export const ARCHITECTURE_NODES: Node<ArchitectureNodeData>[] = [
     id: 'up-tools',
     parentId: 'group-tools',
     type: 'architectureNode',
-    position: { x: 36, y: 482 },
+    position: { x: 36, y: 496 },
     extent: 'parent',
     data: {
       label: '6G UP',
       type: 'nf',
       domain: 'TRF',
       subtitle: 'User plane',
-      description: 'Forwarding tools.',
+      description: 'Path and forwarding tools.',
       tools: [
         {
-          id: 'reachability',
-          name: 'Reachability Tool',
-          purpose: 'Check reachability',
-          input: 'target service and UP state',
-          output: 'reachability result',
-        },
-        {
-          id: 'forwarding',
-          name: 'Forwarding Setup Tool',
-          purpose: 'Apply forwarding',
-          input: 'UP configuration',
-          output: 'forwarding state',
+          id: 'forwarding-rule-tool',
+          name: 'Install_Forwarding_Rule_tool',
+          purpose: 'Install forwarding path',
+          input: 'agent_id, pdu_session_id, subnet_id',
+          description: 'Programs the user-plane forwarding rule that carries agent traffic through the selected subnet path.',
+          endpoint: 'POST /nupf-forwarding/v1/rules',
+          parameters: [
+            { name: 'agent_id', type: 'string', required: true, description: 'The identity of the embodied agent.' },
+            { name: 'pdu_session_id', type: 'string', required: true, description: 'The PDU session bound to the subnet.' },
+            { name: 'subnet_id', type: 'string', required: true, description: 'The target subnet identifier.' }
+          ]
         },
       ],
     },
-  },
+  }
 ];
 
 export const ARCHITECTURE_EDGES: Edge<ArchitectureEdgeData>[] = [];
