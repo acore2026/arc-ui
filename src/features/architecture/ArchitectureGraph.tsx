@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import {
   Background,
   Controls,
@@ -10,7 +10,10 @@ import {
   useReactFlow,
   useEdgesState,
   useNodesState,
+  addEdge,
   type Edge,
+  type OnConnect,
+  type Node,
 } from '@xyflow/react';
 import {
   Bot,
@@ -19,23 +22,21 @@ import {
   Database,
   Globe2,
   Shield,
-  Smartphone,
   Waypoints,
   Zap,
 } from 'lucide-react';
 import {
   ARCHITECTURE_EDGES,
-  ARCHITECTURE_NODES,
   type ArchitectureEdgeData,
   type ArchitectureNodeData,
 } from '../../lib/architectureData';
+import architectureInit from '../../lib/architecture-init.json';
+import CardEditPanel from './CardEditPanel';
 import '@xyflow/react/dist/style.css';
 import './ArchitectureGraph.css';
 
 const NodeIcon: React.FC<{ type: ArchitectureNodeData['type'] }> = ({ type }) => {
   switch (type) {
-    case 'phone':
-      return <Smartphone size={18} />;
     case 'srf':
       return <Waypoints size={18} />;
     case 'agent':
@@ -73,12 +74,36 @@ const ArchitectureNode: React.FC<{ data: ArchitectureNodeData; selected?: boolea
     );
   }
 
-  const isPillNode = data.type === 'phone' || data.type === 'srf' || (data.type === 'gateway' && data.label === 'IGW');
+  const isPillNode = data.type === 'srf' || (data.type === 'gateway' && data.label === 'IGW');
   const showCardHandles = data.type !== 'nf';
+
+  const getHandlePosition = (pos: string) => {
+    switch (pos) {
+      case 'right': return Position.Right;
+      case 'left':
+      default: return Position.Left;
+    }
+  };
 
   return (
     <div className={`arch-node arch-node-${data.type} ${isPillNode ? 'arch-node-pill' : ''} ${selected ? 'is-selected' : ''}`}>
-      {showCardHandles && <Handle type="target" position={Position.Left} className="arch-card-handle" />}
+      {data.handles?.filter((h) => h.position === 'left' || h.position === 'right').map((h, idx) => (
+        <Handle
+          key={h.id || idx}
+          id={h.id}
+          type={h.type}
+          position={getHandlePosition(h.position)}
+          className="arch-card-handle"
+        />
+      ))}
+
+      {data.showDefaultHandles && (
+        <>
+          {showCardHandles && <Handle type="target" position={Position.Left} className="arch-card-handle" />}
+          {showCardHandles && <Handle type="source" position={Position.Right} className="arch-card-handle arch-card-source" />}
+        </>
+      )}
+
       <div className="arch-node-heading">
         <div className="arch-node-icon">
           <NodeIcon type={data.type} />
@@ -113,11 +138,6 @@ const ArchitectureNode: React.FC<{ data: ArchitectureNodeData; selected?: boolea
             </div>
           ))}
         </div>
-      )}
-
-      {showCardHandles && <Handle type="source" position={Position.Right} className="arch-card-handle arch-card-source" />}
-      {(data.type === 'agent' || data.type === 'gateway') && (
-        <Handle id="tool-source" type="source" position={Position.Bottom} className="arch-card-handle arch-tool-source" />
       )}
     </div>
   );
@@ -183,10 +203,43 @@ const ArchitectureGraph: React.FC = () => {
       };
     });
   }, []);
-  const [nodes, , onNodesChange] = useNodesState(ARCHITECTURE_NODES);
-  const [edges, , onEdgesChange] = useEdgesState(defaultEdges);
+  const [nodes, setNodes, onNodesChange] = useNodesState(architectureInit as Node<ArchitectureNodeData>[]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(defaultEdges);
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [showLines, setShowLines] = useState(false);
   const [exportLabel, setExportLabel] = useState('Copy JSON');
+
+  const selectedNode = useMemo(() => 
+    nodes.find((n) => n.id === selectedNodeId),
+    [nodes, selectedNodeId]
+  );
+
+  const onNodeClick = useCallback((_: React.MouseEvent, node: Node<ArchitectureNodeData>) => {
+    if (node.data.type !== 'domain') {
+      setSelectedNodeId(node.id);
+    } else {
+      setSelectedNodeId(null);
+    }
+  }, []);
+
+  const updateNodeData = useCallback((id: string, updates: Partial<ArchitectureNodeData>) => {
+    setNodes((nds) => 
+      nds.map((node) => {
+        if (node.id === id) {
+          return {
+            ...node,
+            data: { ...node.data, ...updates },
+          };
+        }
+        return node;
+      })
+    );
+  }, [setNodes]);
+
+  const onConnect: OnConnect = useCallback(
+    (params) => setEdges((eds) => addEdge({ ...params, type: 'default', className: 'arch-edge arch-edge-handoff' }, eds)),
+    [setEdges]
+  );
 
   const handleCopyLayout = async () => {
     const payload = nodes.map((node) => {
@@ -196,11 +249,21 @@ const ArchitectureGraph: React.FC = () => {
 
       return {
         id: node.id,
-        label: node.data.label,
-        type: node.data.type,
+        type: node.type,
         parentId: node.parentId ?? null,
         position: node.position,
-        ...(node.data.type === 'domain' ? { size: { width, height } } : {}),
+        data: {
+          label: node.data.label,
+          type: node.data.type,
+          subtitle: node.data.subtitle,
+          description: node.data.description,
+          showDefaultHandles: node.data.showDefaultHandles,
+          handles: node.data.handles,
+          skills: node.data.skills,
+          tools: node.data.tools,
+          domain: node.data.domain,
+        },
+        ...(node.data.type === 'domain' ? { style: { width, height } } : {}),
       };
     });
     const json = `${JSON.stringify(payload, null, 2)}\n`;
@@ -261,12 +324,17 @@ const ArchitectureGraph: React.FC = () => {
               nodeTypes={nodeTypes}
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
+              onNodeClick={onNodeClick}
+              onConnect={onConnect}
+              onEdgesDelete={(deletedEdges) => {
+                setEdges((eds) => eds.filter((e) => !deletedEdges.some((d) => d.id === e.id)));
+              }}
               fitView
               fitViewOptions={{ padding: 0.08 }}
               minZoom={0.45}
               maxZoom={1.35}
               nodesDraggable
-              nodesConnectable={false}
+              nodesConnectable={true}
               elementsSelectable
             >
               <Background color="#dbeafe" gap={28} size={1} />
@@ -275,6 +343,15 @@ const ArchitectureGraph: React.FC = () => {
             </ReactFlow>
           </div>
         </section>
+
+        {selectedNode && (
+          <CardEditPanel
+            nodeId={selectedNode.id}
+            data={selectedNode.data}
+            onUpdate={updateNodeData}
+            onClose={() => setSelectedNodeId(null)}
+          />
+        )}
       </main>
     </div>
   );

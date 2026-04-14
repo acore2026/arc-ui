@@ -103,12 +103,180 @@
 .arch-layout {
   flex: 1;
   min-height: 0;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  display: flex;
+  flex-direction: column;
   padding: 0.75rem;
+  position: relative;
+}
+
+.arch-edit-panel {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1000;
+  width: 280px;
+  max-height: calc(100% - 2rem);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 12px;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.arch-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.arch-checkbox-label input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+}
+
+.arch-checkbox-label span {
+  font-size: 0.75rem;
+  color: #475569;
+  font-weight: 700;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.arch-edit-header {
+  padding: 0.85rem;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.95);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.arch-edit-header h2 {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 850;
+  text-transform: uppercase;
+  color: #475569;
+  letter-spacing: 0.05em;
+}
+
+.arch-close-btn,
+.arch-add-btn,
+.arch-delete-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.arch-close-btn:hover,
+.arch-add-btn:hover {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.arch-delete-btn:hover {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+.arch-edit-content {
+  padding: 1rem;
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.arch-edit-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.arch-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.arch-edit-section label {
+  font-size: 0.65rem;
+  font-weight: 850;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.arch-edit-section input,
+.arch-edit-section textarea,
+.arch-edit-section select {
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  background: #ffffff;
+  font-size: 0.75rem;
+  color: #0f172a;
+  transition: border-color 0.2s ease;
+}
+
+.arch-edit-section input:focus,
+.arch-edit-section textarea:focus,
+.arch-edit-section select:focus {
+  outline: none;
+  border-color: #0ea5e9;
+  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.1);
+}
+
+.arch-edit-section textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.arch-handle-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.arch-handle-item {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.arch-handle-item select {
+  flex: 1;
+  padding: 0.35rem;
+}
+
+.arch-empty-text {
+  font-size: 0.64rem;
+  color: #94a3b8;
+  font-style: italic;
+  padding: 0.5rem;
+  background: #f8fafc;
+  border-radius: 6px;
 }
 
 .arch-canvas-shell {
+  flex: 1;
   min-height: 0;
   border: 1px solid rgba(226, 232, 240, 0.95);
   border-radius: 8px;
@@ -169,9 +337,9 @@
 }
 
 .arch-node {
-  width: 142px;
-  min-height: 64px;
-  padding: 0.72rem;
+  width: 136px;
+  min-height: 58px;
+  padding: 0.62rem;
   border-radius: 8px;
   border: 1px solid rgba(203, 213, 225, 0.94);
   background: rgba(255, 255, 255, 0.97);
@@ -187,12 +355,14 @@
 }
 
 .arch-node-heading {
-  gap: 0.62rem;
+  display: flex;
+  align-items: center;
+  gap: 0.52rem;
 }
 
 .arch-node-icon {
-  width: 2rem;
-  height: 2rem;
+  width: 1.72rem;
+  height: 1.72rem;
   border-radius: 8px;
   display: inline-flex;
   align-items: center;
@@ -208,22 +378,17 @@
 
 .arch-node-label {
   color: #0f172a;
-  font-size: 0.8rem;
+  font-size: 0.74rem;
   font-weight: 850;
   line-height: 1.15;
 }
 
 .arch-node-subtitle {
-  margin-top: 0.22rem;
+  margin-top: 0.16rem;
   color: #64748b;
-  font-size: 0.64rem;
+  font-size: 0.58rem;
   font-weight: 650;
   line-height: 1.25;
-}
-
-.arch-node-phone .arch-node-icon {
-  color: #0f766e;
-  background: #ccfbf1;
 }
 
 .arch-node-srf .arch-node-icon {
@@ -237,8 +402,8 @@
 }
 
 .arch-node-registry {
-  width: 174px;
-  min-height: 160px;
+  width: 168px;
+  min-height: 146px;
   border-color: rgba(245, 158, 11, 0.34);
   background: linear-gradient(180deg, rgba(255, 251, 235, 0.86), rgba(255, 255, 255, 0.98));
 }
@@ -269,7 +434,18 @@
 }
 
 .arch-node-agent {
-  min-height: 58px;
+  width: 132px;
+  min-height: 50px;
+  padding: 0.54rem;
+}
+
+.arch-node-agent .arch-node-icon {
+  width: 1.55rem;
+  height: 1.55rem;
+}
+
+.arch-node-agent .arch-node-heading {
+  gap: 0.46rem;
 }
 
 .arch-node-pill {
@@ -356,26 +532,29 @@
   border: 2px solid #ffffff;
   background: #94a3b8;
   box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.5);
+  z-index: 5;
+  opacity: 0;
+  transition: opacity 0.15s ease, box-shadow 0.15s ease;
 }
 
 .arch-card-handle {
-  opacity: 0.65;
+  pointer-events: auto;
 }
 
 .arch-card-source {
   background: #64748b;
 }
 
-.arch-tool-source {
-  bottom: -5px;
-  background: #0ea5e9;
-  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.12);
-}
-
 .arch-tool-handle {
   left: -5px;
   background: #0ea5e9;
   box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.14);
+}
+
+.arch-node:hover .arch-card-handle,
+.arch-node.is-selected .arch-card-handle,
+.arch-tool-pill:hover .arch-tool-handle {
+  opacity: 0.78;
 }
 
 .arch-edge .react-flow__edge-path {
@@ -415,6 +594,21 @@
   stroke-width: 1;
   rx: 6;
   ry: 6;
+}
+
+.arch-domain-agent-runtime {
+  background: rgba(250, 245, 255, 0.46);
+  border: 1px solid rgba(168, 85, 247, 0.28);
+}
+
+.arch-domain-discovery {
+  background: rgba(255, 251, 235, 0.6);
+  border: 1px solid rgba(245, 158, 11, 0.34);
+}
+
+.arch-domain-nf-tool-domain {
+  background: rgba(240, 249, 255, 0.5);
+  border: 1px solid rgba(14, 165, 233, 0.28);
 }
 
 @media (max-width: 1180px) {
