@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Background,
+  ControlButton,
   Controls,
   Handle,
   Position,
@@ -13,6 +14,7 @@ import {
   type Node,
 } from '@xyflow/react';
 import { AnimatePresence, motion } from 'framer-motion';
+import ReactMarkdown from 'react-markdown';
 import {
   Bot,
   Check,
@@ -21,11 +23,15 @@ import {
   Database,
   FileText,
   HardDrive,
+  ListChecks,
+  LoaderCircle,
   Network,
   Play,
   RadioTower,
   RotateCcw,
   Route,
+  Search,
+  Send,
   X,
   Zap,
 } from 'lucide-react';
@@ -102,6 +108,35 @@ interface ConversationMessage {
 }
 
 const messages = conversationData.messages as ConversationMessage[];
+
+const enrichChatText = (text: string) => text
+  .replaceAll('Connect a new embodied agent into the network subnet.', '**Intent:** connect a new `embodied agent` into the network subnet.')
+  .replaceAll('Searching skill library for:', '**Searching ARF** for')
+  .replaceAll('Drafting execution plan for ACN skill.', '**Drafting plan** for `ACN` skill.')
+  .replaceAll('Delegating task', '**Delegating task**')
+  .replaceAll('to ConnectionAgent.', 'to `ConnectionAgent`.')
+  .replaceAll('Found matching skill:', '**Found matching skill:**')
+  .replaceAll('Plan drafted successfully:', '**Plan drafted successfully:**')
+  .replaceAll('Request classified as connection onboarding.', '**Request classified** as `connection onboarding`.')
+  .replaceAll('I will select the appropriate skill, prepare a deterministic plan, and delegate execution to the Connection Agent.', 'I will select the appropriate skill, prepare a **deterministic plan**, and delegate execution to **Connection Agent**.')
+  .replaceAll('Skill selected: ACN.', '**Skill selected:** `ACN` via ARF.')
+  .replaceAll('Plan drafted.', '**Plan drafted.**')
+  .replaceAll('connection-specific task', '`connection-specific` task')
+  .replaceAll('Connection Agent', '**Connection Agent**')
+  .replaceAll('Task accepted.', '**Task accepted.**')
+  .replaceAll('I will execute the ACN workflow exactly in the prescribed order.', 'I will execute the `ACN` workflow exactly in the prescribed order.')
+  .replaceAll('Step 1 passed.', '**Step 1 passed.**')
+  .replaceAll('Subscription is valid.', 'Subscription is valid.')
+  .replaceAll('Step 2 passed.', '**Step 2 passed.**')
+  .replaceAll('subnet_id=subnet_family_042', '`subnet_id=subnet_family_042`')
+  .replaceAll('Step 3 passed.', '**Step 3 passed.**')
+  .replaceAll('Access token issued.', 'Access token issued.')
+  .replaceAll('Step 4 passed.', '**Step 4 passed.**')
+  .replaceAll('Token validation succeeded.', 'Token validation succeeded.')
+  .replaceAll('Step 5 passed.', '**Step 5 passed.**')
+  .replaceAll('PDU session established.', 'PDU session established.')
+  .replaceAll('Subtask completed successfully.', '**Subtask completed successfully.**')
+  .replaceAll('Final result: robot_dog_01 connected to subnet_family_042 with PDU session pdu_subnet_family_042_robot_dog_01.', 'Final result: `robot_dog_01` connected to `subnet_family_042` with PDU session `pdu_subnet_family_042_robot_dog_01`.');
 
 for (const msg of messages) {
   if (msg.role === 'system') continue;
@@ -232,7 +267,7 @@ for (const msg of messages) {
     phase,
     role: msg.role,
     name: msg.name || (msg.role === 'user' ? 'User' : 'System'),
-    text,
+    text: enrichChatText(text),
     isTool,
     toolName,
     toolDetails,
@@ -316,6 +351,49 @@ const phaseToStage = (phase: StoryPhase): AnimationStage => {
 };
 
 const sleep = (ms: number) => new Promise((resolve) => window.setTimeout(resolve, ms));
+
+const formatChatTimestamp = (date: Date) => {
+  const pad = (value: number) => String(value).padStart(2, '0');
+
+  return [
+    `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`,
+    `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`,
+  ].join(' ');
+};
+
+const formatMsgcapFilename = (date: Date) => {
+  const pad = (value: number) => String(value).padStart(2, '0');
+  const token = typeof crypto !== 'undefined' && 'randomUUID' in crypto
+    ? crypto.randomUUID().slice(0, 4)
+    : Math.random().toString(16).slice(2, 6);
+
+  return `acn-${pad(date.getMonth() + 1)}${pad(date.getDate())}-${pad(date.getHours())}${pad(date.getMinutes())}-${token}.msgcap`;
+};
+
+const getFrameDelay = (frame: Frame) => {
+  if (frame.role === 'user') {
+    return 1300;
+  }
+
+  if (frame.role === 'tool' && isInternalToolName(frame.toolName)) {
+    return 850;
+  }
+
+  if (frame.role === 'assistant' && isInternalToolName(frame.toolName)) {
+    return 1800;
+  }
+
+  if (frame.isTool && frame.role === 'assistant') {
+    return 2200;
+  }
+
+  if (frame.isTool && frame.role === 'tool') {
+    return 1250;
+  }
+
+  const readingTime = frame.text.length * 18;
+  return Math.min(2800, Math.max(1400, readingTime));
+};
 
 const getNodeAnimationState = (id: string, stage: AnimationStage): ArchitectureNodeData['animationState'] => {
   if (stage === 'idle') {
@@ -658,6 +736,25 @@ const internalLabelForTool = (toolName?: string) => {
   }
 };
 
+const InternalActionIcon: React.FC<{ toolName?: string }> = ({ toolName }) => {
+  switch (toolName) {
+    case 'skill_select':
+      return <Search size={12} />;
+    case 'draft_plan':
+      return <ListChecks size={12} />;
+    case 'delegate_task':
+      return <Send size={12} />;
+    default:
+      return <Bot size={12} />;
+  }
+};
+
+const ChatMarkdown: React.FC<{ text: string }> = ({ text }) => (
+  <div className="arch-chat-markdown">
+    <ReactMarkdown>{text}</ReactMarkdown>
+  </div>
+);
+
 const AgentChatPanel: React.FC<{ frames: Frame[]; activeIndex: number; isPlaying: boolean }> = ({ frames, activeIndex, isPlaying }) => {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const visibleFrames = activeIndex >= 0 ? frames.slice(0, activeIndex + 1) : [];
@@ -708,7 +805,10 @@ const AgentChatPanel: React.FC<{ frames: Frame[]; activeIndex: number; isPlaying
           <span>Agent run</span>
           <h2>Execution log</h2>
         </div>
-        <strong>{isPlaying ? 'running' : activeIndex >= 0 ? 'ready' : 'idle'}</strong>
+        <strong>
+          {isPlaying && <LoaderCircle size={12} className="arch-chat-spinner" />}
+          {isPlaying ? 'running' : activeIndex >= 0 ? 'ready' : 'idle'}
+        </strong>
       </div>
 
       <div className="arch-chat-stream" ref={scrollRef}>
@@ -732,6 +832,7 @@ const AgentChatPanel: React.FC<{ frames: Frame[]; activeIndex: number; isPlaying
           const active = isActiveItem(frame, index);
           const internal = frame.role === 'assistant' && isInternalToolName(frame.toolName);
           const internalDone = hasCompletedInternal(frame.toolName, index);
+          const messageTime = formatChatTimestamp(new Date());
           const itemClass = [
             'arch-chat-item',
             `arch-chat-${frame.role === 'user' ? 'intent' : frame.isTool ? 'tool' : 'message'}`,
@@ -751,11 +852,11 @@ const AgentChatPanel: React.FC<{ frames: Frame[]; activeIndex: number; isPlaying
               {internal ? (
                 <div className="arch-chat-check-row">
                   <span className={`arch-chat-check ${internalDone ? 'is-complete' : ''}`}>
-                    {internalDone ? <Check size={12} /> : index + 1}
+                    {internalDone ? <Check size={12} /> : <InternalActionIcon toolName={frame.toolName} />}
                   </span>
                   <div>
                     <strong>{internalLabelForTool(frame.toolName)}</strong>
-                    <p>{frame.text}</p>
+                    <ChatMarkdown text={frame.text} />
                   </div>
                 </div>
               ) : frame.role === 'user' ? (
@@ -764,7 +865,7 @@ const AgentChatPanel: React.FC<{ frames: Frame[]; activeIndex: number; isPlaying
                     <FileText size={13} />
                     <span>Intent</span>
                   </div>
-                  <p>{frame.text}</p>
+                  <ChatMarkdown text={frame.text} />
                 </>
               ) : frame.isTool ? (
                 <>
@@ -790,12 +891,20 @@ const AgentChatPanel: React.FC<{ frames: Frame[]; activeIndex: number; isPlaying
                     <Bot size={13} />
                     <span>{frame.name}</span>
                   </div>
-                  <p>{frame.text}</p>
+                  <ChatMarkdown text={frame.text} />
                 </>
               )}
+              <time className="arch-chat-time" dateTime={messageTime}>{messageTime}</time>
             </motion.div>
           );
         })}
+
+        {isPlaying && (
+          <div className="arch-chat-working" aria-live="polite">
+            <LoaderCircle size={13} className="arch-chat-spinner" />
+            <span>{activeFrame ? `Working on ${stageLabelForFrame(activeFrame).toLowerCase()}` : 'Working'}</span>
+          </div>
+        )}
       </div>
     </aside>
   );
@@ -1038,6 +1147,36 @@ const AutoFitViewport: React.FC = () => {
   return null;
 };
 
+const FineZoomControls: React.FC = () => {
+  const { getViewport, zoomTo } = useReactFlow();
+  const zoomStep = 0.08;
+
+  return (
+    <>
+      <ControlButton
+        aria-label="Zoom in"
+        title="Zoom in"
+        onClick={() => {
+          const { zoom } = getViewport();
+          void zoomTo(Math.min(1.5, zoom + zoomStep), { duration: 120 });
+        }}
+      >
+        +
+      </ControlButton>
+      <ControlButton
+        aria-label="Zoom out"
+        title="Zoom out"
+        onClick={() => {
+          const { zoom } = getViewport();
+          void zoomTo(Math.max(0.35, zoom - zoomStep), { duration: 120 });
+        }}
+      >
+        -
+      </ControlButton>
+    </>
+  );
+};
+
 const ArchitectureGraph: React.FC = () => {
   const [storyPhase, setStoryPhase] = useState<StoryPhase>('idle');
   const [completedArtifacts, setCompletedArtifacts] = useState<ArtifactId[]>([]);
@@ -1049,6 +1188,7 @@ const ArchitectureGraph: React.FC = () => {
 
   const activeStage = phaseToStage(storyPhase);
   const currentFrame = frameIndex >= 0 && frameIndex < frames.length ? frames[frameIndex] : null;
+  const msgcapFilename = useMemo(() => formatMsgcapFilename(new Date()), []);
 
   const openSkillDetail = useCallback((nodeId: string) => {
     const node = ARCHITECTURE_NODES.find((candidate) => candidate.id === nodeId);
@@ -1257,7 +1397,7 @@ const ArchitectureGraph: React.FC = () => {
          }
       }
 
-      await sleep(1600);
+      await sleep(getFrameDelay(frame));
     }
 
     if (runRef.current !== runId) return;
@@ -1278,7 +1418,13 @@ const ArchitectureGraph: React.FC = () => {
             <Zap size={15} />
           </div>
           <div>
-            <h1>NW-Agent Architecture Sandbox</h1>
+            <h1>AICore Intent Tracing Portal</h1>
+            <label className="arch-trace-picker">
+              <span>Msgcap</span>
+              <select value={msgcapFilename} onChange={() => undefined} aria-label="Message capture file">
+                <option value={msgcapFilename}>{msgcapFilename}</option>
+              </select>
+            </label>
           </div>
         </div>
         <button type="button" className="arch-step-button" onClick={handlePlay} disabled={isPlaying} style={{ minWidth: 'auto', padding: '0.6rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -1321,7 +1467,9 @@ const ArchitectureGraph: React.FC = () => {
                 proOptions={{ hideAttribution: true }}
               >
                 <Background color="#dbeafe" gap={28} size={1} />
-                <Controls showInteractive={false} />
+                <Controls showZoom={false} showInteractive={false}>
+                  <FineZoomControls />
+                </Controls>
                 <AutoFitViewport />
               </ReactFlow>
             </div>

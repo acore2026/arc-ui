@@ -12,8 +12,8 @@
 }
 
 .arch-topbar {
-  min-height: 58px;
-  padding: 0.6rem 0.9rem;
+  min-height: 46px;
+  padding: 0.42rem 0.72rem;
   border-bottom: 1px solid rgba(226, 232, 240, 0.95);
   background: rgba(255, 255, 255, 0.96);
   display: flex;
@@ -31,13 +31,13 @@
 }
 
 .arch-brand {
-  gap: 0.65rem;
+  gap: 0.52rem;
   min-width: 0;
 }
 
 .arch-brand-mark {
-  width: 2rem;
-  height: 2rem;
+  width: 1.72rem;
+  height: 1.72rem;
   border-radius: 8px;
   display: inline-flex;
   align-items: center;
@@ -50,16 +50,42 @@
 
 .arch-brand h1 {
   margin: 0;
-  font-size: 0.98rem;
+  font-size: 0.88rem;
   line-height: 1.2;
   font-weight: 850;
 }
 
-.arch-brand p {
-  margin: 0.12rem 0 0;
+.arch-brand p,
+.arch-trace-picker {
+  margin: 0.1rem 0 0;
   color: #64748b;
   font-size: 0.72rem;
   font-weight: 700;
+}
+
+.arch-trace-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.34rem;
+  font-size: 0.58rem;
+  line-height: 1.15;
+}
+
+.arch-trace-picker span {
+  color: #64748b;
+  font-weight: 820;
+}
+
+.arch-trace-picker select {
+  max-width: 13.5rem;
+  border: 1px solid rgba(203, 213, 225, 0.86);
+  border-radius: 8px;
+  background: #ffffff;
+  color: #334155;
+  padding: 0.14rem 1.35rem 0.14rem 0.4rem;
+  font: inherit;
+  font-weight: 760;
+  cursor: pointer;
 }
 
 .arch-step-button {
@@ -68,7 +94,7 @@
   border-radius: 8px;
   background: #ffffff;
   color: #4c1d95;
-  padding: 0.4rem 0.58rem;
+  padding: 0.34rem 0.5rem;
   display: grid;
   gap: 0.08rem;
   justify-items: start;
@@ -103,26 +129,27 @@
   height: 100%;
   min-height: 0;
   display: grid;
-  grid-template-columns: minmax(18rem, 23rem) minmax(0, 1fr);
+  grid-template-columns: minmax(24rem, 30rem) minmax(0, 1fr);
   gap: 0.75rem;
 }
 
 .arch-chat-panel {
   min-height: 0;
-  border: 1px solid rgba(226, 232, 240, 0.96);
+  border: 1px solid rgba(226, 232, 240, 0.78);
   border-radius: 8px;
-  background: #ffffff;
-  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.06);
+  background: #f8fafc;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.05);
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
 .arch-chat-header {
-  padding: 0.72rem;
-  border-bottom: 1px solid rgba(226, 232, 240, 0.92);
+  padding: 0.68rem 0.72rem;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.82);
+  background: rgba(255, 255, 255, 0.92);
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
 }
@@ -130,16 +157,16 @@
 .arch-chat-header span {
   display: block;
   color: #64748b;
-  font-size: 0.58rem;
+  font-size: 0.62rem;
   font-weight: 850;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
 .arch-chat-header h2 {
-  margin: 0.16rem 0 0;
+  margin: 0.12rem 0 0;
   color: #0f172a;
-  font-size: 0.92rem;
+  font-size: 0.98rem;
   line-height: 1.16;
 }
 
@@ -149,91 +176,119 @@
   background: rgba(240, 253, 250, 0.96);
   color: #0f766e;
   padding: 0.18rem 0.4rem;
-  font-size: 0.58rem;
+  font-size: 0.62rem;
   font-weight: 850;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.24rem;
 }
 
 .arch-chat-stream {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: 0.68rem;
+  padding: 0.78rem;
   display: grid;
   align-content: start;
-  gap: 0.52rem;
+  gap: 0.48rem;
 }
 
 .arch-chat-empty {
-  border: 1px dashed rgba(203, 213, 225, 0.96);
+  border: 0;
   border-radius: 8px;
-  padding: 0.72rem;
-  background: #f8fafc;
+  padding: 0.68rem 0.2rem;
+  background: transparent;
+  text-align: center;
 }
 
 .arch-chat-empty span,
 .arch-chat-stage span {
   color: #64748b;
-  font-size: 0.58rem;
-  font-weight: 850;
-  letter-spacing: 0.06em;
+  font-size: 0.64rem;
+  font-weight: 780;
+  letter-spacing: 0;
   text-transform: uppercase;
 }
 
 .arch-chat-empty p {
   margin: 0.24rem 0 0;
   color: #475569;
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   line-height: 1.36;
 }
 
 .arch-chat-stage {
-  margin: 0.46rem 0 0.08rem;
-  padding: 0 0 0 0.48rem;
-  border-left: 2px solid rgba(148, 163, 184, 0.7);
+  margin: 0.54rem 0 0.08rem;
+  padding: 0;
+  border-left: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.42rem;
+}
+
+.arch-chat-stage::before,
+.arch-chat-stage::after {
+  content: '';
+  height: 1px;
+  flex: 1;
+  background: rgba(203, 213, 225, 0.76);
 }
 
 .arch-chat-item {
-  max-width: 92%;
-  border: 1px solid rgba(226, 232, 240, 0.94);
+  max-width: 88%;
+  border: 1px solid rgba(226, 232, 240, 0.78);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.98);
-  padding: 0.58rem;
-  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.04);
+  background: #ffffff;
+  padding: 0.54rem 0.58rem;
+  box-shadow: 0 5px 12px rgba(15, 23, 42, 0.035);
+  justify-self: start;
+  display: grid;
+  gap: 0.28rem;
 }
 
 .arch-chat-item.is-active {
-  border-color: rgba(124, 58, 237, 0.42);
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1), 0 12px 24px rgba(88, 28, 135, 0.08);
+  border-color: rgba(124, 58, 237, 0.32);
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.08), 0 8px 18px rgba(88, 28, 135, 0.06);
 }
 
 .arch-chat-intent {
-  border-color: rgba(20, 184, 166, 0.3);
-  background: rgba(240, 253, 250, 0.98);
+  border-color: rgba(20, 184, 166, 0.22);
+  background: #f0fdfa;
   justify-self: end;
 }
 
 .arch-chat-tool {
-  border-color: rgba(14, 165, 233, 0.26);
-  background: rgba(240, 249, 255, 0.96);
-  justify-self: stretch;
-  max-width: 100%;
+  max-width: 96%;
+  border-color: rgba(14, 165, 233, 0.24);
+  border-left: 3px solid rgba(14, 165, 233, 0.72);
+  border-radius: 6px;
+  background: #f0f9ff;
+  box-shadow: none;
+  justify-self: start;
+  padding: 0.5rem 0.56rem;
+}
+
+.arch-chat-tool.is-active {
+  border-color: rgba(14, 165, 233, 0.28);
+  border-left-color: rgba(14, 165, 233, 0.9);
+  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.08);
 }
 
 .arch-chat-internal {
-  border-color: rgba(245, 158, 11, 0.34);
-  background: rgba(255, 251, 235, 0.96);
-  justify-self: stretch;
-  max-width: 100%;
+  border-color: rgba(245, 158, 11, 0.22);
+  background: #fffbeb;
+  justify-self: start;
+  max-width: 92%;
 }
 
 .arch-chat-agent-planningagent {
-  background: rgba(245, 243, 255, 0.98);
-  border-color: rgba(124, 58, 237, 0.28);
+  background: #ffffff;
+  border-color: rgba(203, 213, 225, 0.9);
 }
 
 .arch-chat-agent-connectionagent {
-  background: rgba(240, 249, 255, 0.98);
-  border-color: rgba(14, 165, 233, 0.28);
+  background: #ffffff;
+  border-color: rgba(203, 213, 225, 0.9);
 }
 
 .arch-chat-agent-user {
@@ -251,31 +306,145 @@
 .arch-chat-meta {
   align-items: center;
   color: #64748b;
-  font-size: 0.58rem;
+  font-size: 0.64rem;
+  font-weight: 850;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+  margin-bottom: 0.26rem;
+}
+
+.arch-chat-meta svg {
+  width: 0.86rem;
+  height: 0.86rem;
+}
+
+.arch-chat-tool .arch-chat-meta {
+  color: #0369a1;
+  font-size: 0.62rem;
   font-weight: 850;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  margin-bottom: 0.28rem;
+}
+
+.arch-chat-message .arch-chat-meta {
+  color: #475569;
+  font-size: 0.62rem;
+}
+
+.arch-chat-message .arch-chat-meta svg {
+  color: #7c3aed;
+}
+
+.arch-chat-tool .arch-chat-meta svg {
+  color: #0284c7;
 }
 
 .arch-chat-item p {
   margin: 0;
   color: #334155;
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   line-height: 1.42;
+}
+
+.arch-chat-markdown {
+  color: #334155;
+  font-size: 0.8rem;
+  line-height: 1.48;
+}
+
+.arch-chat-markdown > :first-child {
+  margin-top: 0;
+}
+
+.arch-chat-markdown > :last-child {
+  margin-bottom: 0;
+}
+
+.arch-chat-markdown p {
+  margin: 0.24rem 0;
+}
+
+.arch-chat-markdown strong {
+  color: #0f172a;
+  font-weight: 840;
+}
+
+.arch-chat-markdown em {
+  color: #475569;
+  font-style: italic;
+}
+
+.arch-chat-markdown ul,
+.arch-chat-markdown ol {
+  margin: 0.28rem 0 0.28rem 1rem;
+  padding: 0;
+}
+
+.arch-chat-markdown li {
+  margin: 0.14rem 0;
+}
+
+.arch-chat-markdown code {
+  border: 1px solid rgba(203, 213, 225, 0.8);
+  border-radius: 6px;
+  background: rgba(248, 250, 252, 0.92);
+  color: #0f172a;
+  padding: 0.04rem 0.18rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.72rem;
+}
+
+.arch-chat-markdown pre {
+  margin: 0.34rem 0;
+  border: 1px solid rgba(203, 213, 225, 0.84);
+  border-radius: 8px;
+  background: #f8fafc;
+  padding: 0.48rem;
+  overflow: auto;
+}
+
+.arch-chat-markdown pre code {
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+
+.arch-chat-markdown a {
+  color: #0369a1;
+  font-weight: 780;
+  text-decoration: none;
+}
+
+.arch-chat-markdown a:hover {
+  text-decoration: underline;
 }
 
 .arch-chat-item > strong,
 .arch-chat-check-row strong {
   display: block;
   color: #0f172a;
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   line-height: 1.24;
 }
 
+.arch-chat-tool > strong {
+  color: #075985;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.74rem;
+  font-weight: 820;
+}
+
+.arch-chat-time {
+  justify-self: end;
+  color: #94a3b8;
+  font-size: 0.6rem;
+  font-weight: 720;
+  line-height: 1;
+}
+
 .arch-chat-check {
-  width: 1.2rem;
-  height: 1.2rem;
+  width: 1.08rem;
+  height: 1.08rem;
   border-radius: 999px;
   flex-shrink: 0;
   display: inline-flex;
@@ -296,15 +465,18 @@
 
 .arch-chat-tool-grid {
   display: grid;
-  gap: 0.3rem;
-  margin-top: 0.4rem;
+  gap: 0.16rem;
+  margin-top: 0.36rem;
 }
 
 .arch-chat-tool-grid div {
-  border: 1px solid rgba(226, 232, 240, 0.88);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.86);
-  padding: 0.36rem;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
+  display: grid;
+  grid-template-columns: minmax(4.8rem, 7.5rem) minmax(0, 1fr);
+  gap: 0.4rem;
 }
 
 .arch-chat-tool-grid span {
@@ -317,10 +489,37 @@
 }
 
 .arch-chat-tool-grid p {
-  margin-top: 0.14rem;
+  margin-top: 0;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 0.62rem;
+  color: #334155;
   word-break: break-word;
+}
+
+.arch-chat-working {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.34rem;
+  justify-self: center;
+  border: 1px solid rgba(124, 58, 237, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #5b21b6;
+  padding: 0.24rem 0.44rem;
+  font-size: 0.62rem;
+  font-weight: 760;
+  box-shadow: 0 5px 12px rgba(88, 28, 135, 0.05);
+}
+
+.arch-chat-spinner {
+  animation: arch-spin 0.84s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes arch-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .arch-stage-note {
@@ -376,6 +575,10 @@
 
 .arch-flow-wrap .react-flow__controls-button {
   border-bottom: 1px solid rgba(226, 232, 240, 0.85);
+  color: #334155;
+  font-size: 0.9rem;
+  font-weight: 850;
+  line-height: 1;
 }
 
 .arch-domain-label {
@@ -385,51 +588,51 @@
   border-radius: 8px;
   border: 1px solid rgba(203, 213, 225, 0.66);
   background:
-    linear-gradient(rgba(148, 163, 184, 0.13) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(148, 163, 184, 0.13) 1px, transparent 1px),
-    rgba(255, 255, 255, 0.7);
+    linear-gradient(rgba(148, 163, 184, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.09) 1px, transparent 1px),
+    rgba(255, 255, 255, 0.76);
   background-size: 1.35rem 1.35rem, 1.35rem 1.35rem, auto;
-  backdrop-filter: blur(12px) saturate(1.08);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82), 0 12px 28px rgba(15, 23, 42, 0.04);
+  backdrop-filter: blur(12px) saturate(1.02);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82), 0 10px 24px rgba(15, 23, 42, 0.035);
   pointer-events: none;
 }
 
 .arch-domain-request--intent {
   background:
-    linear-gradient(rgba(8, 145, 178, 0.13) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(8, 145, 178, 0.13) 1px, transparent 1px),
-    rgba(236, 254, 255, 0.4);
+    linear-gradient(rgba(8, 145, 178, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(8, 145, 178, 0.1) 1px, transparent 1px),
+    rgba(255, 255, 255, 0.74);
   background-size: 1.35rem 1.35rem, 1.35rem 1.35rem, auto;
-  border-color: rgba(8, 145, 178, 0.26);
+  border-color: rgba(8, 145, 178, 0.18);
 }
 
 .arch-domain-agent-layer {
   background:
-    linear-gradient(rgba(124, 58, 237, 0.12) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(124, 58, 237, 0.12) 1px, transparent 1px),
-    rgba(245, 243, 255, 0.45);
+    linear-gradient(rgba(124, 58, 237, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(124, 58, 237, 0.09) 1px, transparent 1px),
+    rgba(255, 255, 255, 0.74);
   background-size: 1.35rem 1.35rem, 1.35rem 1.35rem, auto;
-  border-color: rgba(124, 58, 237, 0.24);
+  border-color: rgba(124, 58, 237, 0.17);
 }
 
 .arch-domain-repository-layer,
 .arch-domain-arf {
   background:
-    linear-gradient(rgba(245, 158, 11, 0.14) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(245, 158, 11, 0.14) 1px, transparent 1px),
-    rgba(255, 251, 235, 0.5);
+    linear-gradient(rgba(245, 158, 11, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(245, 158, 11, 0.1) 1px, transparent 1px),
+    rgba(255, 255, 255, 0.74);
   background-size: 1.35rem 1.35rem, 1.35rem 1.35rem, auto;
-  border-color: rgba(245, 158, 11, 0.3);
+  border-color: rgba(245, 158, 11, 0.2);
 }
 
 .arch-domain-nf-hosted-tools,
 .arch-domain-trf {
   background:
-    linear-gradient(rgba(14, 165, 233, 0.12) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(14, 165, 233, 0.12) 1px, transparent 1px),
-    rgba(240, 249, 255, 0.48);
+    linear-gradient(rgba(14, 165, 233, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(14, 165, 233, 0.09) 1px, transparent 1px),
+    rgba(255, 255, 255, 0.74);
   background-size: 1.35rem 1.35rem, 1.35rem 1.35rem, auto;
-  border-color: rgba(14, 165, 233, 0.28);
+  border-color: rgba(14, 165, 233, 0.18);
 }
 
 .arch-domain-title {

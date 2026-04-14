@@ -74,18 +74,18 @@ const layout = {
   requestX: 40,
   requestY: 270,
   requestW: 240,
-  requestH: 330,
+  requestH: 280,
   centerX: 340,
   arfY: 24,
   arfW: 660,
   arfH: 210,
   agentY: 270,
   agentW: 660,
-  agentH: 560,
+  agentH: 500,
   trfX: 1040,
   trfY: 40,
   trfW: 270,
-  trfH: 780,
+  trfH: 720,
 };
 
 export const ARCHITECTURE_NODES: Node<ArchitectureNodeData>[] = [
@@ -141,7 +141,7 @@ export const ARCHITECTURE_NODES: Node<ArchitectureNodeData>[] = [
     id: 'ue-request',
     parentId: 'group-request',
     type: 'architectureNode',
-    position: { x: 28, y: 48 },
+    position: { x: 40, y: 56 },
     extent: 'parent',
     data: {
       label: 'Intent',
@@ -155,7 +155,7 @@ export const ARCHITECTURE_NODES: Node<ArchitectureNodeData>[] = [
     id: 'srf',
     parentId: 'group-request',
     type: 'architectureNode',
-    position: { x: 28, y: 224 },
+    position: { x: 52, y: 192 },
     extent: 'parent',
     data: {
       label: 'SRF',
@@ -197,7 +197,7 @@ export const ARCHITECTURE_NODES: Node<ArchitectureNodeData>[] = [
     id: 'planning-agent',
     parentId: 'group-agents',
     type: 'architectureNode',
-    position: { x: 56, y: 160 },
+    position: { x: 56, y: 82 },
     extent: 'parent',
     data: {
       label: 'Planning Agent',
@@ -212,7 +212,7 @@ export const ARCHITECTURE_NODES: Node<ArchitectureNodeData>[] = [
     id: 'connection-agent',
     parentId: 'group-agents',
     type: 'architectureNode',
-    position: { x: 400, y: 30 },
+    position: { x: 390, y: 54 },
     extent: 'parent',
     data: {
       label: 'Connection Agent',
@@ -226,7 +226,7 @@ export const ARCHITECTURE_NODES: Node<ArchitectureNodeData>[] = [
     id: 'data-agent',
     parentId: 'group-agents',
     type: 'architectureNode',
-    position: { x: 400, y: 340 },
+    position: { x: 390, y: 292 },
     extent: 'parent',
     data: {
       label: 'Data Agent',
@@ -240,7 +240,7 @@ export const ARCHITECTURE_NODES: Node<ArchitectureNodeData>[] = [
     id: 'computing-agent',
     parentId: 'group-agents',
     type: 'architectureNode',
-    position: { x: 400, y: 450 },
+    position: { x: 390, y: 388 },
     extent: 'parent',
     data: {
       label: 'Computing Agent',
@@ -295,7 +295,7 @@ export const ARCHITECTURE_NODES: Node<ArchitectureNodeData>[] = [
     id: 'udm-tools',
     parentId: 'group-tools',
     type: 'architectureNode',
-    position: { x: 36, y: 204 },
+    position: { x: 36, y: 230 },
     extent: 'parent',
     data: {
       label: '6G UDM',
@@ -335,7 +335,7 @@ export const ARCHITECTURE_NODES: Node<ArchitectureNodeData>[] = [
     id: 'sm-tools',
     parentId: 'group-tools',
     type: 'architectureNode',
-    position: { x: 36, y: 350 },
+    position: { x: 36, y: 402 },
     extent: 'parent',
     data: {
       label: '6G SM',
@@ -363,7 +363,7 @@ export const ARCHITECTURE_NODES: Node<ArchitectureNodeData>[] = [
     id: 'up-tools',
     parentId: 'group-tools',
     type: 'architectureNode',
-    position: { x: 36, y: 496 },
+    position: { x: 36, y: 532 },
     extent: 'parent',
     data: {
       label: '6G UP',
