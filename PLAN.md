@@ -1,725 +1,802 @@
-# Interactive Tracing Review UI Plan
+# Codex Brief — Concept-First UI for Agentic Core Architecture
 
-## Goal
+## 1. Objective
 
-Build a visually strong demo app that explains the proposal through a simplified, easy-to-follow agentic execution flow.
+Build a polished demo UI in React Flow that explains the **conceptual relationship** between:
 
-The app should emphasize three ideas:
+- **Network AI Agents (NW-Agents)**
+- **Agent / Tool repositories (ARF / TRF)**
+- **NF-hosted tools**
+- **UE request / intent**
+- optional **agent collaboration**
 
-1. **Skill-based discovery** instead of fixed identity-based routing.
-2. **Agent orchestration** as the decision layer.
-3. **NF MCP tool execution** as the concrete execution layer.
+This is **not** a full topology simulator and **not** a detailed telecom packet-flow viewer.
 
-The demo should feel polished and animated, but remain conceptually simple. It is a showcase, not a standards-accurate simulator.
+The product goal is to make the architecture understandable at a glance:
 
----
+**request -> agent reasoning -> repository lookup -> tool selection -> deterministic execution**
 
-## Scope and simplification choices
-
-Keep the demo focused on the following:
-
-- Ignore A2UI for now.
-- Ignore the new user-plane tunnel / Agentic Service Stratum transport details.
-- Treat the proposal as a **skill and agent execution framework**.
-- Treat NFs as **tool providers**:
-  - AM
-  - SM
-  - Policy
-  - DB
-  - UP
-- Treat AAIHF as an **agent runtime domain**, not a single monolithic box.
-- Treat ACRF as **registry + discovery only**.
-- Treat IGW as a **thin invocation bridge / adapter**.
-
-This keeps the story understandable while still reflecting the proposal’s central idea.
+The UI should feel like a premium **architecture explorer / trace review product** for an agentic 6G core.
 
 ---
 
-## Core story the demo should tell
+## 2. Source direction to follow
 
-The user should understand this sequence within seconds:
+Use **S2-2602109** as the primary architecture reference.
 
-**Request arrives → agent classifies it → relevant skill is discovered → concrete tools are invoked → state changes are shown → result returns**
+This means the implementation should follow these concepts closely:
 
-That is the entire demo philosophy.
+- **NW-Agents** are first-class entities in the 6G core.
+- There can be multiple NW-Agent types, especially:
+  - **Planning Agent**
+  - **Connection Agent**
+  - **Data Agent**
+  - **Computing Agent**
+- **SRF** receives UE requests and routes them to the corresponding NW-Agent.
+- **TRF** is the repository for **tools**.
+- **ARF** is the repository for **agents**.
+- **Tools** are modularized network capabilities exposed by NFs or external components.
+- **Intent** can be included or absent; the architecture should support both.
+- The NW-Agent can:
+  - interpret request / intent,
+  - evaluate feasibility and constraints,
+  - plan tasks,
+  - invoke tools,
+  - collaborate with other NW-Agents,
+  - observe feedback and adjust decisions in a closed loop.
 
----
-
-## Suggested architecture for the demo
-
-### Device / ingress side
-
-**Phone**
-- Visual origin of the request.
-- Starts the scenario.
-- Receives final result.
-
-**SRF**
-- Entry point.
-- Normalizes the request into a structured task.
-- Sends the task to the agent runtime.
-- Should feel lightweight, like a front door or session ingress.
-
-### NF tool domain
-
-This is the deterministic execution side.
-
-**AM**
-- Access / session-related network logic.
-
-**SM**
-- Session and context setup logic.
-
-**Policy**
-- Policy and resource decision logic.
-
-**DB**
-- State / profile / context lookup.
-
-**UP**
-- User-plane or forwarding-related execution role.
-
-In the simplified demo, each NF can visually expose:
-- registered skills
-- available MCP tools
-- recent tool executions
-
-### Agent runtime domain
-
-This is the purple domain in your sketch.
-
-**System Agent**
-- Generic dispatcher.
-- First decision point after ingress.
-- Routes the request to the right specialized agent.
-
-**Connection Agent**
-- Handles traditional connectivity and core-network logic.
-- Best place to show session preparation, admission, token or context steps.
-
-**Compute Agent**
-- Handles edge compute or compute resource allocation logic.
-- Should feel like a service-specialist agent.
-
-**Sense Agent**
-- Handles sensing-related logic, semantic task interpretation, or sensor workflow.
-- Should visually feel similar to Compute Agent but with different iconography and color tone.
-
-**ACRF**
-- Capability registry and semantic discovery node.
-- Never presented as an executor.
-- Only used to answer “which capability matches this request?”
-
-**IGW**
-- Invocation bridge.
-- Takes selected capability / skill target and converts it into actual MCP tool execution flow.
-- Keep it thin. It should not visually compete with the agents.
+This brief should stay aligned to that model.
 
 ---
 
-## Best demo scenario
+## 3. Important change from the earlier direction
 
-Use a scenario that mixes classic network logic with new agentic logic.
+Earlier idea:
+- heavier focus on **System AI Agent + ARF + NF tools**
+- relationship-first architecture
+- a possible “skill” layer as a concept bridge
 
-Recommended scenario:
+New direction with **S2-2602109**:
+- use **NW-Agent** terminology
+- explicitly distinguish:
+  - **SRF** for routing requests
+  - **ARF** for agent registration/discovery
+  - **TRF** for tool registration/discovery
+- make **Planning Agent** the orchestration center
+- make **Connection / Data / Computing Agents** the domain-specialized collaborators
+- make **tools**, not generic “skills”, the main execution abstraction
 
-**Phone requests a sensing task that requires connectivity preparation and compute support.**
+### Important product decision
 
-This gives you two clear phases:
+For this UI, **Tool** is the primary architecture term.
 
-### Phase 1: connectivity preparation
-Handled mainly by:
-- System Agent
+If the product still uses the word **skill** anywhere, treat it only as a **secondary explanatory label** for humans, such as:
+- a capability grouping,
+- an ability tag,
+- or a conceptual label above one or more tools.
+
+Do **not** build “skill” as the core backend-facing object unless needed later.
+
+---
+
+## 4. Product goal
+
+The user should understand these ideas quickly:
+
+1. **Agents are the reasoning layer**
+2. **Repositories make the system discoverable**
+3. **Tools are the executable modular capabilities**
+4. **NFs are the hosting owners of tools**
+5. **Planning Agent coordinates**
+6. **Specialized agents execute subtasks or invoke their own tools**
+7. **Execution is iterative and can adapt based on feedback**
+
+---
+
+## 5. What the UI should emphasize
+
+The UI should emphasize **relationships and concepts**, not general telecom topology.
+
+Primary emphasis:
+- which agent is responsible for what
+- how agents discover other agents
+- how agents discover tools
+- how tools are owned by NFs
+- how a request becomes a plan
+- how a plan becomes a set of tool invocations
+- how collaboration works between planning and specialized agents
+
+Lower emphasis:
+- full CN node placement
+- exact network message paths
+- exhaustive SBI sequencing
+- complete RAN / UP graph
+- standards-accurate line-by-line signaling
+
+---
+
+## 6. Core concept model
+
+### 6.1 Layer model
+
+Use the architecture as a **layered concept system**, not a literal network map.
+
+Recommended conceptual layers:
+
+1. **Request / Intent Layer**
+2. **Agent Layer**
+3. **Repository Layer**
+4. **Tool Layer**
+5. **NF Host Layer**
+6. **Feedback / Closed Loop Layer**
+
+This allows the product to explain:
+- where requests enter,
+- who reasons,
+- where discovery happens,
+- what gets executed,
+- who owns execution,
+- how service is adjusted.
+
+### 6.2 Primary mental model
+
+Use this as the central product sentence:
+
+**NW-Agent interprets the request, consults repositories, selects tools, and orchestrates deterministic execution.**
+
+---
+
+## 7. Recommended entity model for the UI
+
+## 7.1 Main entities
+
+### UE
+- source of request
+- may send request with or without intent
+- should be lightweight in UI
+- should not dominate the screen
+
+### SRF
+- request entry and routing function
+- routes request to the appropriate NW-Agent
+- should be shown as a gateway / dispatcher, not a planner
+
+### Planning Agent
+- primary orchestrator
+- interprets request / intent
+- checks feasibility and constraints
+- decomposes request into tasks
+- coordinates specialized agents
+- discovers tools through TRF
+- discovers agents through ARF
+- performs iterative adjustment
+
+This should be the **main visual center** of the UI.
+
+### Connection Agent
+- handles connection-related tasks
+- works with connection, mobility, session, QoS, policy related tools
+
+### Data Agent
+- handles data-related tasks
+- data collection, data processing, transformation, distribution, storage
+
+### Computing Agent
+- handles compute-related tasks
+- compute host preparation, compute resource reasoning, service-specific computing orchestration
+
+### ARF
+- repository for NW-Agent profiles
+- supports registration, discovery, selection of agents
+- should visually behave like a directory of collaborators
+
+### TRF
+- repository for tool definitions
+- supports tool registration, discovery, selection
+- should visually behave like a catalog of executable capabilities
+
+### NF-hosted tools
+Primary hosting examples:
+- 6G AM tools
+- 6G SM tools
+- 6G PCF tools
+- 6G NSSF tools
+- analytics / location / policy related tools
+- optional AF-hosted tools
+
+### Hosting NFs
+NFs should appear mainly as **tool owners / buckets**, not as the star of the UI.
+
+---
+
+## 8. Relationship-first UI direction
+
+The app should feel like a **concept explorer**, not a topology dashboard.
+
+### Recommended main composition
+
+Use a **relationship graph or relationship matrix** centered on the Planning Agent.
+
+Strong recommendation:
+- keep a **small graph**
+- keep a **tight number of objects on screen**
+- reveal complexity progressively
+
+### Recommended visual structure
+
+#### Center
+- **Planning Agent**
+
+#### Left side
+- **Request / Intent**
+- **UE**
+- **SRF**
+
+#### Upper / side support
+- **ARF**
+- **TRF**
+
+#### Right side
+- specialized agents:
+  - Connection Agent
+  - Data Agent
+  - Computing Agent
+
+#### Bottom / execution shelf
+- NF-hosted tools grouped by NF
+
+This keeps the product focused on reasoning and relationships, while still giving React Flow a clear structure.
+
+---
+
+## 9. React Flow usage direction
+
+React Flow should be used as a **structured concept graph**, not as a literal telecom network topology.
+
+### Use React Flow for:
+- entity cards
+- relationship edges
+- activation states
+- focus transitions
+- interactive exploration
+- drilldown from abstract entity to detailed metadata
+
+### Do not use React Flow for:
+- dense carrier backbone diagrams
+- large multi-hop transport paths
+- full procedural sequencing drawn as a permanent graph
+- overloaded line animations everywhere
+
+### Node design principle
+Every node must communicate:
+- what it is
+- why it matters
+- what it owns or interacts with
+- whether it is idle, selected, active, or referenced
+
+---
+
+## 10. Recommended node categories
+
+Use consistent node classes.
+
+### Request nodes
+Examples:
+- UE Request
+- Intent
+- Task Bundle
+
+### Agent nodes
+Examples:
+- Planning Agent
 - Connection Agent
-- ACRF
-- NF tools
+- Data Agent
+- Computing Agent
 
-### Phase 2: service execution
-Handled mainly by:
-- System Agent
-- Sense Agent or Compute Agent
-- ACRF
-- IGW
-- NF tools or service-facing execution tools
+### Repository nodes
+Examples:
+- ARF
+- TRF
 
-This is ideal because the audience can see both:
-- traditional network-side operations
-- newly introduced skill-based agent logic
+### Tool nodes
+Examples:
+- Authentication Tool
+- Subscription Control Tool
+- Mobility Management Tool
+- Reachability Tool
+- SM characteristics determination tool
+- Traffic treatment determination tool
+- UP configuration tool
+- DNS Resolver Tool
+- VN creation tool
+- Edge server determination tool
 
----
-
-## Recommended end-to-end flow
-
-### Stage 0: registry bootstrap
-This happens at app start or as a replayable setup phase.
-
-- NFs register capabilities into ACRF.
-- ACRF indexes skills.
-- UI shows each NF becoming “discoverable”.
-- Agent domain remains idle but ready.
-
-Purpose:
-- Teaches the audience what the registry is before the live trace begins.
-
-### Stage 1: request ingress
-- Phone emits a user action.
-- SRF receives the request.
-- SRF transforms it into a structured task.
-- Structured request moves into agent domain.
-
-### Stage 2: system dispatch
-- System Agent inspects the request.
-- System Agent classifies it.
-- It determines that connectivity preparation is required first.
-- It hands off to Connection Agent.
-
-### Stage 3: connectivity skill discovery
-- Connection Agent queries ACRF for relevant network capabilities.
-- ACRF returns candidate skills / target profiles.
-- Chosen path is highlighted.
-
-### Stage 4: NF tool execution
-- Connection Agent initiates deterministic tool flow through the NFs.
-- Tool execution updates NF cards.
-- Session / policy / state changes are reflected in the UI.
-
-### Stage 5: service skill discovery
-- System Agent delegates to Sense Agent or Compute Agent.
-- Specialized agent requests relevant capability from ACRF.
-- ACRF returns the most relevant skill target.
-
-### Stage 6: invocation bridge and execution
-- Specialized agent hands the selected skill to IGW.
-- IGW bridges into concrete execution.
-- NF or service-side execution proceeds.
-- Results propagate back.
-
-### Stage 7: response and review
-- Final result returns to the Phone.
-- Timeline is complete.
-- User can inspect each step after playback.
+### NF owner nodes
+Examples:
+- 6G AM
+- 6G SM
+- 6G PCF
+- 6G NSSF
+- AF / 3rd-party host
+- analytics / location provider
 
 ---
 
-## What the app should visually communicate
+## 11. Tool representation requirements
 
-At all times, the viewer should be able to answer five questions:
+The source proposal gives a clear direction: tools are modularized network capabilities exposed through controlled interfaces.
 
-1. **What is happening now?**
-2. **Which node is active?**
-3. **Is this discovery or execution?**
-4. **What changed in network / agent state?**
-5. **What happened previously?**
+The UI should represent tools with enough structure so that users can understand **why an agent chose them**.
 
-If the UI answers those clearly, the demo will feel strong even with a simplified backend.
+### Every tool card should support these fields conceptually
+- Name
+- Purpose
+- Description
+- Hosting NF
+- Pre-condition
+- Input
+- Output
+- Post-condition
+- Optional procedures / notes
 
----
+This is one of the most important parts of the product.
 
-## UI structure
-
-Use a three-panel structure.
-
-## 1. Main topology canvas
-This is the hero area.
-
-It should show:
-- domain grouping
-- nodes and their relationships
-- active message flow
-- current step highlights
-- skill discovery versus tool execution
-
-This is where attention goes during playback.
-
-### Canvas goals
-- Immediate readability
-- Cinematic motion
-- Easy pause-and-inspect review
-
-## 2. Trace timeline panel
-A secondary panel that logs the journey.
-
-Each trace entry should show:
-- source
-- target
-- event type
-- brief summary
-- status
-- timing / order
-
-Purpose:
-- Helps users review the whole process.
-- Makes the app feel like an observability or tracing product rather than just an animation.
-
-## 3. Detail / inspector panel
-When the user clicks a node or timeline event, the side panel should show:
-- what the step means
-- intent summary
-- selected skill
-- candidate skills returned by ACRF
-- tool execution summary
-- before / after state changes
-
-Purpose:
-- Gives depth to the demo without cluttering the canvas.
+### Product implication
+When a tool is selected, the side panel should reveal:
+- why it exists
+- what it changes
+- what inputs it needs
+- what state it returns
+- who hosts it
 
 ---
 
-## Suggested page layout
+## 12. Agent representation requirements
 
-### Top bar
-Include:
-- app title
-- scenario selector
-- playback controls
-- speed control
-- replay button
-- mode toggle such as “Live” / “Review”
+### Planning Agent card
+Must clearly show:
+- request understanding
+- feasibility evaluation
+- decomposition into subtasks
+- tool planning
+- repository usage
+- monitoring / refinement loop
 
-### Left main area
-- topology canvas
+### Specialized agent cards
+Must clearly show:
+- domain scope
+- supported responsibilities
+- available abilities
+- related tools
+- collaboration status
 
-### Right side panel
-Tabs or stacked sections:
-- Trace
-- Inspector
-- State
-
-### Optional bottom strip
-A compact event ticker can work well if you want the interface to feel more “broadcast” or “operations center” like.
-
----
-
-## Visual design direction
-
-Aim for:
-- soft dark or muted light background
-- clean cards with subtle glass or layered panels
-- glowing active states
-- restrained palette with meaningful color coding
-- rounded, modern components
-- deliberate negative space
-
-The app should feel like a premium control-plane visualization tool, not a slide deck.
+### Agent profile view
+Because S2-2602109 explicitly describes ARF and agent profiles, the UI should support an **agent profile inspector** that can display:
+- Agent ID
+- Agent Name
+- URL
+- Description
+- abilities
+- ability descriptions
+- expected ability inputs
+- status / availability
 
 ---
 
-## Domain styling suggestions
+## 13. Intent representation requirements
 
-Each domain should be visually distinct but not loud.
+Use the proposal’s **semi-structured intent** approach.
 
-### Device domain
-- coolest, lightest tone
-- clear and simple
-- visually calm
+The UI should not treat intent as a raw text blob only.
 
-### NF tool domain
-- grounded, structured, deterministic feel
-- slightly industrial or infrastructure-like
+It should support structured decomposition into:
 
-### Agent runtime domain
-- more dynamic and premium
-- subtle emphasis to signal this is the “intelligent” layer
+- Description
+- Goals
+- Requirements
+- Conditions
+- Guidelines
+- Extra-info
 
-Use different border styles or background tints so domain boundaries are obvious even when animation is paused.
+This is essential because it gives the user a bridge between:
+- human request,
+- machine interpretation,
+- agent planning,
+- tool execution.
 
----
-
-## Node design suggestions
-
-Each node should support multiple visual states.
-
-### Idle
-- soft card
-- muted icon
-- light shadow
-
-### Selected
-- brighter outline
-- raised card feeling
-
-### Processing
-- pulsing glow
-- animated border or icon halo
-- optional scanning or ripple effect
-
-### Successful
-- subtle green confirmation accent
-- completed badge or check pulse
-
-### Failed
-- red accent
-- shake, flash, or warning marker
-
-### Discoverable / registered
-- small skill badge
-- registry-linked indicator
-
-Each node card can optionally display:
-- title
-- role subtitle
-- state badge
-- skill count
-- tool count
+### Product implication
+When a request is clicked, show:
+- original user statement
+- parsed structured intent
+- which parts influenced planning
+- which constraints mattered most
 
 ---
 
-## Edge and message flow suggestions
+## 14. Views the product should support
 
-Edges should carry meaning, not just connectivity.
+## 14.1 Concept View
+Default mode.
 
-### Discovery edges
-- dashed
-- softer motion
-- search-like pulse
+Shows:
+- UE / SRF
+- Planning Agent
+- specialized agents
+- ARF / TRF
+- tool groups
+- relationships only
 
-### Execution edges
-- solid
-- brighter motion
-- faster, more decisive movement
+This is the main architecture explanation view.
 
-### Handoff edges
-- short animated travel pulse between agents
+## 14.2 Request-to-Plan View
+Shows how a request becomes a task plan.
 
-### Return edges
-- lighter reverse motion
-- confirms response or result propagation
+Focus:
+- request received
+- intent parsed
+- feasibility checked
+- tasks created
+- target agents / tools selected
 
-### Completed path
-- softly illuminated for a short time after execution
+## 14.3 Agent Collaboration View
+Shows agent-to-agent task delegation.
 
-This will make the graph tell a story even without reading labels.
+Focus:
+- Planning Agent
+- one or more specialized agents
+- ARF-based discovery
+- task creation / update / status
 
----
+## 14.4 Tool View
+Shows tool discovery and tool invocation logic.
 
-## Animation philosophy
+Focus:
+- TRF
+- tool metadata
+- hosting NFs
+- invocation selection
+- result states
 
-Do not animate everything all the time.
+## 14.5 Closed-Loop View
+Shows feedback and iterative adjustment.
 
-Instead:
-- keep the base scene calm
-- animate only the active path
-- use rhythm to show causality
-- let the UI “breathe” between steps
-
-The animation should feel intentional and confident, not noisy.
-
----
-
-## Most important animation idea
-
-Animate the transformation from abstraction to execution.
-
-That means the UI should visually show:
-
-**request → intent → skill → selected target → tool invocation → state update → result**
-
-This is the single most valuable narrative device in the whole app.
-
----
-
-## Recommended animation sequence for each major step
-
-### 1. Ingress pulse
-- Phone highlights.
-- Request chip appears.
-- Chip moves to SRF.
-
-### 2. Normalization
-- SRF briefly expands or lights up.
-- Request chip morphs into a more structured object.
-
-### 3. Agent handoff
-- Structured task moves to System Agent.
-- System Agent glows and “thinks”.
-- It emits a handoff chip to a specialized agent.
-
-### 4. Intent to skill transformation
-- Specialized agent displays a small intent badge.
-- Intent badge transforms into a skill badge or URI-style token.
-- This token moves to ACRF.
-
-### 5. Discovery response
-- ACRF lights up with a search / matching effect.
-- Candidate targets briefly fan out or appear as lightweight overlays.
-- Final match is emphasized.
-
-### 6. Execution bridge
-- Selected match moves to IGW.
-- IGW emits one or more execution tokens toward NF nodes.
-
-### 7. Tool execution
-- NF node receives the token.
-- Node expands slightly.
-- A small tool label appears.
-- State update is shown on the card.
-
-### 8. Result propagation
-- Result chip travels back to the invoking agent.
-- Agent completes and returns status upward.
-- Final completion returns to Phone.
-
-This sequence will make the demo feel smart and cinematic without being overly complex.
+Focus:
+- feedback from UE / AF / tools / other agents
+- evaluation
+- updated parameters
+- revised task or tool usage
 
 ---
 
-## Animation suggestions by UI area
+## 15. Recommended interaction model
 
-## Topology canvas
-- moving message pulses
-- node glows
-- temporary skill badges
-- path illumination
-- domain-level subtle background response when an area is active
+### Click an agent
+Show:
+- responsibilities
+- abilities
+- linked repositories
+- linked tools
+- active tasks
+- collaboration partners
 
-## Timeline panel
-- new events slide in smoothly
-- active event row pulses softly
-- completed items settle into a quieter state
+### Click TRF
+Show:
+- list of discovered tools
+- tool search results
+- tool categories
+- hosting NFs
+- semantic descriptions
 
-## Inspector panel
-- selected content crossfades rather than hard switches
-- show gradual reveal of sections instead of instant overload
+### Click ARF
+Show:
+- list of discovered agents
+- registered profiles
+- available abilities
+- candidate selection
 
----
+### Click a tool
+Show:
+- definition template fields
+- hosting NF
+- typical use cases
+- related agent types
+- pre / post conditions
 
-## Suggested motion vocabulary
+### Click an NF host
+Show:
+- all tools provided by that NF
+- whether the NF is mainly control / policy / session / analytics / external
 
-Use a small set of recurring motions so the UI feels coherent.
-
-### Pulse
-Use for:
-- active node
-- active message
-- current timeline row
-
-### Morph
-Use for:
-- intent becoming skill
-- skill becoming execution token
-
-### Expand / collapse
-Use for:
-- node detail preview
-- candidate list reveal
-- tool execution detail
-
-### Sweep or scan
-Use for:
-- ACRF matching
-- registry search
-
-### Ripple
-Use for:
-- successful completion
-- domain activation
-
-### Drift / float
-Use sparingly for ambient premium feel in idle state
+### Click a request
+Show:
+- original request
+- structured intent
+- generated tasks
+- selected agent path
+- selected tool path
 
 ---
 
-## Color semantics
+## 16. Animation direction
 
-Assign clear meanings.
+Animation should explain **reasoning and translation**, not physical routing.
 
-### Purple
-- agent reasoning
-- handoff between agents
-- planning and orchestration
+### Key motion ideas
 
-### Amber / gold
-- ACRF discovery
-- registry operations
-- candidate matching
+#### 1. Request intake
+- request appears from UE
+- routed through SRF
+- lands on Planning Agent
 
-### Blue
-- NF tool invocation
-- infrastructure operations
-- deterministic execution
+#### 2. Intent parsing
+- request expands into structured intent fields
+- important fields highlight
+- plan preview appears
 
-### Green
-- success
-- validated state
-- completed transitions
+#### 3. Repository lookup
+- Planning Agent sends focused lookup pulses to:
+  - ARF for agent discovery
+  - TRF for tool discovery
 
-### Red
-- failure
-- rejection
-- invalid path
+#### 4. Selection
+- candidate agents or tools appear as temporary options
+- chosen items lock in
+- non-selected options fade back
 
-Keep these meanings consistent across canvas, timeline, and inspector.
+#### 5. Task delegation
+- Planning Agent emits task cards to specialized agents
+- task cards should look declarative, not low-level
 
----
+#### 6. Tool invocation
+- specialized agent or planning agent selects tool cards
+- tool cards briefly activate
+- hosting NF subtly lights up
 
-## Interaction suggestions
+#### 7. Feedback and loop
+- feedback chips return from:
+  - tools
+  - UE
+  - other agents
+- planning card updates state or adjusts task path
 
-### Playback modes
-Support:
-- autoplay demo mode
-- step-through review mode
-- click-to-focus mode
-
-### Scenario presets
-Keep a few curated scenarios:
-- connectivity-first flow
-- compute-assisted flow
-- sensing-assisted flow
-- mixed service flow
-
-### Click behaviors
-Clicking a node should:
-- highlight its related events
-- dim unrelated topology
-- open relevant inspector details
-
-Clicking a timeline event should:
-- jump the canvas to that moment
-- highlight the active path
-- show the associated node states
-
-### Hover behavior
-Hover should be subtle and informative, not distracting.
+### Motion rule
+Keep base scene calm.
+Animate only the currently relevant relationships.
 
 ---
 
-## Information layers
+## 17. Visual hierarchy
 
-The demo should support multiple levels of understanding.
+Order of visual importance:
 
-### Level 1: cinematic overview
-User sees only motion and high-level labels.
+1. Planning Agent
+2. Active request / task
+3. Active repository result
+4. Active specialized agent
+5. Active tool
+6. Hosting NF
+7. UE / SRF
+8. passive supporting objects
 
-### Level 2: architecture understanding
-User inspects nodes, relationships, and flow categories.
-
-### Level 3: execution review
-User opens trace details and understands what the system did step by step.
-
-This layered design makes the app useful for both quick demos and deeper explanation.
-
----
-
-## Suggested content shown in the inspector
-
-For an agent event:
-- role of the agent
-- why it took control
-- selected next action
-- selected skill
-
-For an ACRF event:
-- request summary
-- candidate capabilities
-- chosen match rationale
-
-For an NF execution event:
-- tool summary
-- affected state
-- inputs and outputs summarized in plain language
-
-For a final result:
-- outcome
-- path used
-- total steps
-- total duration
+This is very important. The screen must never look like “everything is equally important.”
 
 ---
 
-## Suggested app states
+## 18. Design language
 
-The demo should feel rich even when not running.
+Target feel:
+- premium
+- technical
+- calm
+- deliberate
+- structured
+- intelligence-first, not networking-first
 
-### Empty / ready state
-- calm topology
-- tiny ambient motion
-- hint to start scenario
+### Tone
+Think:
+- control-plane product
+- observability interface
+- architecture explorer
+- modern enterprise system
 
-### Live playback state
-- active animated path
-- timeline grows
-- inspector tracks current step
-
-### Paused review state
-- freeze current animation
-- preserve visual highlights
-- allow inspection
-
-### Completed state
-- full path visible
-- user can scrub or replay
-
----
-
-## Make it feel cool without making it messy
-
-A few things will make the app feel premium:
-
-- smooth edge animations
-- subtle depth and glow
-- consistent motion language
-- staged information reveal
-- polished playback controls
-- dimming of inactive areas during active flow
-- visible but elegant state transitions
-
-A few things will make it feel messy:
-
-- too many simultaneous glows
-- too much permanent motion
-- too much text on the graph
-- identical styling for discovery and execution
-- large inspector blocks that instantly flood the screen
+Not:
+- glossy concept art
+- overwhelming telecom diagram
+- toy flowchart
 
 ---
 
-## Recommended first version
+## 19. Color semantics
 
-For the first polished demo, prioritize:
+Use stable meanings.
 
-1. strong topology layout
-2. clear domain grouping
-3. convincing active-path animation
-4. skill discovery visualization
-5. tool execution visualization
-6. usable trace timeline
-7. focused inspector panel
-
-Do not try to simulate every standards detail in version one.
-
-The core success criterion is that a viewer can immediately understand:
-
-**Agents choose skills, ACRF finds capabilities, and NFs execute tools.**
+- **Purple**: agent reasoning, planning, collaboration
+- **Amber**: repository discovery, lookup, candidate selection
+- **Blue**: tool invocation, deterministic execution
+- **Teal / cyan**: active service state, runtime condition, feedback loop
+- **Green**: fulfilled / valid / successful
+- **Red**: blocked / invalid / failed / constraint violation
+- **Grey**: passive infrastructure context
 
 ---
 
-## Future enhancements after the first version
+## 20. Recommended concrete scenarios for the first version
 
-After the first clean version works, you can add:
+Use a small number of scenarios.
 
-- richer scenario library
-- branching / failure / retry animations
-- side-by-side comparison of “traditional routing” vs “skill-based routing”
-- agent confidence or candidate ranking visualization
-- replay scrubbing by time or step
-- domain filters
-- more service-agent types
-- richer state diff visualizations
+### Scenario A — Connection-focused request
+Best for:
+- Planning Agent
+- Connection Agent
+- TRF
+- AM / SM / PCF / NSSF tools
+
+Example:
+- UE requests a connection-oriented service assurance
+- Planning Agent interprets
+- selects connection-related tools
+- executes a plan
+
+### Scenario B — Data + connection collaboration
+Best for:
+- Planning Agent
+- Data Agent
+- ARF discovery
+- TRF tool selection
+- collaboration and task split
+
+Example:
+- UE asks for AR / XR or sensing-assisted experience
+- Planning Agent decomposes into:
+  - connection task
+  - data task
+- Data Agent is discovered and engaged
+- each side uses tools
+- outcome merges
+
+### Scenario C — Closed-loop adjustment
+Best for:
+- ongoing service
+- feedback
+- re-selection / parameter adjustment
+
+Example:
+- service is running
+- QoE degrades
+- agent receives tool / UE / network feedback
+- tool parameters or selected tools are updated
 
 ---
 
-## Final design principle
+## 21. Relationship rules the product should teach
 
-The app should not feel like a standards diagram turned interactive.
+The UI should make these truths obvious:
 
-It should feel like a **premium observability-style product demo for an agentic telecom runtime**.
+### Agent != Tool
+Agents reason and coordinate. Tools execute bounded capabilities.
 
-That means:
-- architecture clarity
-- narrative motion
-- selective detail
-- strong visual hierarchy
-- calm, intentional animation
+### NF != Tool
+NFs host tools. The tool is the callable capability.
 
-The best version of this demo is one where the audience understands the idea before you finish explaining it.
+### ARF != TRF
+ARF is for agents. TRF is for tools.
 
+### Planning Agent != all other agents
+Planning Agent leads and coordinates. Specialized agents execute domain-specific subtasks.
+
+### Request != Intent != Plan
+These are different abstraction levels:
+- request is what arrives
+- intent is interpreted meaning
+- plan is the ordered execution strategy
+
+### Tool invocation != full procedure graph
+The UI should not draw the entire 3GPP flow. It should show modular capability invocation.
+
+---
+
+## 22. What to avoid
+
+Do not build:
+- a full CN topology dashboard
+- a giant always-on message flow graph
+- a standards-accurate signaling simulator
+- a UI dominated by NF boxes and arrows
+- a product where repositories feel like passive storage only
+- a product where tools look like anonymous API calls with no semantics
+
+Do not let the architecture collapse into:
+- “Planning Agent calls random boxes”
+- “everything is a single graph”
+- “skills, tools, and agents all look identical”
+
+---
+
+## 23. MVP deliverable expectations for Codex
+
+The first useful implementation should include:
+
+### A. Main concept graph
+- Planning Agent centered
+- UE + SRF
+- ARF + TRF
+- Connection / Data / Computing Agents
+- bottom tool shelf grouped by NF host
+
+### B. Right-side inspector
+Supports:
+- request details
+- intent details
+- agent profiles
+- tool definitions
+- NF ownership
+
+### C. View mode switcher
+At least:
+- Concept
+- Collaboration
+- Tool
+- Closed Loop
+
+### D. State-driven highlighting
+- selected
+- active
+- candidate
+- delegated
+- invoked
+- feedback received
+- completed
+
+### E. Scenario data
+Ship with 2–3 curated scenarios that demonstrate:
+- simple planning + tool selection
+- multi-agent collaboration
+- closed-loop adjustment
+
+---
+
+## 24. Suggested implementation philosophy
+
+Build the UI as a **narrative architecture product**, not a drawing canvas.
+
+The success condition is not:
+- maximum accuracy of telecom call flow
+
+The success condition is:
+- a viewer understands the roles and relationships after a few clicks
+
+---
+
+## 25. Acceptance criteria
+
+The first version is successful if a reviewer can immediately answer:
+
+1. What is a NW-Agent?
+2. What is the difference between Planning Agent and specialized agents?
+3. What is the difference between ARF and TRF?
+4. What is a tool?
+5. How is a tool different from an NF?
+6. How does a request become a plan?
+7. How does a plan become tool invocations?
+8. How does agent collaboration work?
+9. How can the system react to feedback in a closed loop?
+
+If these answers are visually obvious, the implementation is on the right path.
+
+---
+
+## 26. Final direction statement for Codex
+
+Build a **relationship-first, concept-first React Flow UI** based on **S2-2602109**.
+
+Do not treat this as a full network topology product.
+
+Center the experience on:
+- **Planning Agent**
+- **ARF / TRF**
+- **specialized NW-Agents**
+- **NF-hosted tools**
+- **semi-structured intent**
+- **closed-loop feedback**
+
+Preserve the earlier elegant idea of showing layered abstraction, but make the source-of-truth architecture follow the **NW-Agent / TRF / ARF / tool modularization** model from the Huawei proposal.

@@ -1,26 +1,25 @@
 .arch-demo {
+  --arch-flow-card-width: 9.7rem;
+  --arch-flow-card-height: 2.65rem;
   width: 100%;
   height: 100%;
   min-height: 0;
   display: flex;
   flex-direction: column;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(248, 250, 252, 0.95)),
-    #ffffff;
+  background: #f8fafc;
   color: #0f172a;
   overflow: hidden;
 }
 
 .arch-topbar {
-  min-height: 48px;
-  padding: 0.45rem 0.75rem;
+  min-height: 58px;
+  padding: 0.6rem 0.9rem;
   border-bottom: 1px solid rgba(226, 232, 240, 0.95);
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(14px);
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  background: rgba(255, 255, 255, 0.96);
+  display: flex;
   align-items: center;
-  gap: 0.7rem;
+  justify-content: space-between;
+  gap: 1rem;
   z-index: 3;
 }
 
@@ -32,72 +31,65 @@
 }
 
 .arch-brand {
-  gap: 0.55rem;
+  gap: 0.65rem;
   min-width: 0;
 }
 
 .arch-brand-mark {
-  width: 1.75rem;
-  height: 1.75rem;
+  width: 2rem;
+  height: 2rem;
   border-radius: 8px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(34, 211, 238, 0.42);
-  color: #0891b2;
-  background:
-    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.96), transparent 42%),
-    linear-gradient(180deg, rgba(236, 254, 255, 0.98), rgba(240, 253, 250, 0.96));
-  box-shadow: 0 8px 18px rgba(6, 182, 212, 0.12);
+  border: 1px solid rgba(14, 165, 233, 0.32);
+  color: #0369a1;
+  background: #eff6ff;
+  flex-shrink: 0;
 }
 
 .arch-brand h1 {
   margin: 0;
-  font-size: 0.92rem;
+  font-size: 0.98rem;
   line-height: 1.2;
-  font-weight: 800;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.arch-topbar-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.45rem;
-  flex-wrap: wrap;
-}
-
-.arch-toggle-button,
-.arch-export-button {
-  height: 1.8rem;
-  border-radius: 8px;
-  border: 1px solid rgba(56, 189, 248, 0.42);
-  background: rgba(240, 249, 255, 0.95);
-  color: #0369a1;
-  padding: 0 0.62rem;
-  font-size: 0.68rem;
   font-weight: 850;
-  cursor: pointer;
 }
 
-.arch-toggle-button {
-  border-color: rgba(203, 213, 225, 0.95);
+.arch-brand p {
+  margin: 0.12rem 0 0;
+  color: #64748b;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.arch-step-button {
+  min-width: 12.5rem;
+  border: 1px solid rgba(124, 58, 237, 0.28);
+  border-radius: 8px;
   background: #ffffff;
-  color: #475569;
+  color: #4c1d95;
+  padding: 0.4rem 0.58rem;
+  display: grid;
+  gap: 0.08rem;
+  justify-items: start;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
 }
 
-.arch-toggle-button.is-active {
-  border-color: rgba(14, 165, 233, 0.58);
-  background: rgba(240, 249, 255, 0.96);
-  color: #0369a1;
+.arch-step-button:disabled {
+  cursor: progress;
 }
 
-.arch-toggle-button:hover,
-.arch-export-button:hover {
-  border-color: rgba(14, 165, 233, 0.7);
-  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.12);
+.arch-step-button span {
+  color: #64748b;
+  font-size: 0.58rem;
+  font-weight: 800;
+  text-align: left;
+}
+
+.arch-step-button strong {
+  font-size: 0.78rem;
+  line-height: 1.1;
 }
 
 .arch-layout {
@@ -109,178 +101,27 @@
   position: relative;
 }
 
-.arch-edit-panel {
+.arch-stage-note {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
-  z-index: 1000;
-  width: 280px;
-  max-height: calc(100% - 2rem);
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  border-radius: 12px;
-  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.arch-checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  user-select: none;
-}
-
-.arch-checkbox-label input[type="checkbox"] {
-  width: 14px;
-  height: 14px;
-  margin: 0;
-}
-
-.arch-checkbox-label span {
-  font-size: 0.75rem;
+  top: 1.08rem;
+  left: 1.08rem;
+  z-index: 2;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.96);
   color: #475569;
-  font-weight: 700;
-}
-
-@keyframes slideIn {
-  from { transform: translateX(20px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-
-.arch-edit-header {
-  padding: 0.85rem;
-  border-bottom: 1px solid rgba(226, 232, 240, 0.95);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.arch-edit-header h2 {
-  margin: 0;
-  font-size: 0.85rem;
-  font-weight: 850;
-  text-transform: uppercase;
-  color: #475569;
-  letter-spacing: 0.05em;
-}
-
-.arch-close-btn,
-.arch-add-btn,
-.arch-delete-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #94a3b8;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4px;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-}
-
-.arch-close-btn:hover,
-.arch-add-btn:hover {
-  background: #f1f5f9;
-  color: #475569;
-}
-
-.arch-delete-btn:hover {
-  background: #fee2e2;
-  color: #ef4444;
-}
-
-.arch-edit-content {
-  padding: 1rem;
-  flex: 1;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-}
-
-.arch-edit-section {
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
-}
-
-.arch-section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.arch-edit-section label {
-  font-size: 0.65rem;
-  font-weight: 850;
-  color: #64748b;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.arch-edit-section input,
-.arch-edit-section textarea,
-.arch-edit-section select {
-  padding: 0.5rem;
-  border-radius: 6px;
-  border: 1px solid rgba(226, 232, 240, 0.95);
-  background: #ffffff;
-  font-size: 0.75rem;
-  color: #0f172a;
-  transition: border-color 0.2s ease;
-}
-
-.arch-edit-section input:focus,
-.arch-edit-section textarea:focus,
-.arch-edit-section select:focus {
-  outline: none;
-  border-color: #0ea5e9;
-  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.1);
-}
-
-.arch-edit-section textarea {
-  min-height: 80px;
-  resize: vertical;
-}
-
-.arch-handle-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.arch-handle-item {
-  display: flex;
-  gap: 0.35rem;
-  align-items: center;
-}
-
-.arch-handle-item select {
-  flex: 1;
-  padding: 0.35rem;
-}
-
-.arch-empty-text {
-  font-size: 0.64rem;
-  color: #94a3b8;
-  font-style: italic;
-  padding: 0.5rem;
-  background: #f8fafc;
-  border-radius: 6px;
+  padding: 0.38rem 0.55rem;
+  font-size: 0.66rem;
+  font-weight: 800;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
 }
 
 .arch-canvas-shell {
   flex: 1;
   min-height: 0;
-  border: 1px solid rgba(226, 232, 240, 0.95);
+  border: 1px solid rgba(226, 232, 240, 0.96);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.94);
+  background: #ffffff;
   box-shadow: 0 16px 36px rgba(15, 23, 42, 0.06);
   display: flex;
   flex-direction: column;
@@ -288,15 +129,22 @@
 }
 
 .arch-flow-wrap {
+  position: relative;
   flex: 1;
   min-height: 0;
   background:
-    linear-gradient(90deg, rgba(14, 165, 233, 0.04), transparent 34%, rgba(245, 158, 11, 0.04) 67%, transparent),
+    linear-gradient(180deg, rgba(248, 250, 252, 0.88), rgba(255, 255, 255, 0.9)),
     #ffffff;
+}
+
+.arch-flow-wrap .react-flow {
+  z-index: 1;
 }
 
 .arch-flow-wrap .react-flow__controls {
   border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 8px;
+  overflow: hidden;
   box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
 }
 
@@ -307,62 +155,98 @@
 .arch-domain-label {
   width: 100%;
   height: 100%;
-  padding: 0.85rem;
-  pointer-events: auto;
+  padding: 0.72rem;
+  border-radius: 8px;
+  border: 1px solid rgba(203, 213, 225, 0.78);
+  background: rgba(248, 250, 252, 0.68);
 }
 
-.arch-domain-label .react-flow__resize-control {
-  pointer-events: auto;
+.arch-domain-request--intent {
+  background: rgba(236, 254, 255, 0.42);
+  border-color: rgba(8, 145, 178, 0.26);
 }
 
-.arch-domain-title,
-.arch-domain-subtitle {
-  pointer-events: none;
+.arch-domain-agent-layer {
+  background: rgba(245, 243, 255, 0.58);
+  border-color: rgba(124, 58, 237, 0.24);
+}
+
+.arch-domain-repository-layer,
+.arch-domain-arf {
+  background: rgba(255, 251, 235, 0.72);
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.arch-domain-nf-hosted-tools,
+.arch-domain-trf {
+  background: rgba(240, 249, 255, 0.62);
+  border-color: rgba(14, 165, 233, 0.28);
 }
 
 .arch-domain-title {
-  gap: 0.45rem;
+  gap: 0.42rem;
   color: #475569;
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   font-weight: 850;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
 .arch-domain-subtitle {
-  margin-top: 0.25rem;
-  color: #94a3b8;
-  font-size: 0.68rem;
+  margin-top: 0.24rem;
+  color: #64748b;
+  font-size: 0.66rem;
   font-weight: 700;
 }
 
 .arch-node {
-  width: 136px;
-  min-height: 58px;
-  padding: 0.62rem;
+  inline-size: fit-content;
+  min-inline-size: 10rem;
+  max-inline-size: 16rem;
+  padding: 0.6rem;
+  position: relative;
   border-radius: 8px;
   border: 1px solid rgba(203, 213, 225, 0.94);
   background: rgba(255, 255, 255, 0.97);
   box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  transition: border-color 0.24s ease, box-shadow 0.24s ease, opacity 0.24s ease, filter 0.24s ease;
 }
 
-.arch-node:hover,
-.arch-node.is-selected {
-  transform: translateY(-1px);
+.arch-node.is-dimmed {
+  opacity: 0.82;
+  filter: saturate(0.96);
+}
+
+.arch-node.is-glow {
+  border-color: rgba(124, 58, 237, 0.56);
+  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.12), 0 18px 32px rgba(88, 28, 135, 0.12);
+}
+
+.arch-node.is-owner {
+  border-color: rgba(20, 184, 166, 0.62);
+  background: rgba(240, 253, 250, 0.98);
+  box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.14), 0 18px 32px rgba(15, 118, 110, 0.12);
+}
+
+.arch-node.is-active-tool {
   border-color: rgba(14, 165, 233, 0.58);
-  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.12), 0 14px 26px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.12), 0 18px 32px rgba(2, 132, 199, 0.1);
+}
+
+.arch-node-primary {
+  min-inline-size: 13rem;
+  max-inline-size: 18rem;
+  border-color: rgba(124, 58, 237, 0.38);
+  box-shadow: 0 16px 34px rgba(88, 28, 135, 0.13);
 }
 
 .arch-node-heading {
-  display: flex;
-  align-items: center;
   gap: 0.52rem;
 }
 
 .arch-node-icon {
-  width: 1.72rem;
-  height: 1.72rem;
+  width: 1.78rem;
+  height: 1.78rem;
   border-radius: 8px;
   display: inline-flex;
   align-items: center;
@@ -372,40 +256,35 @@
   color: #475569;
 }
 
-.arch-node-copy {
-  min-width: 0;
-}
-
-.arch-node-label {
-  color: #0f172a;
-  font-size: 0.74rem;
-  font-weight: 850;
-  line-height: 1.15;
-}
-
-.arch-node-subtitle {
-  margin-top: 0.16rem;
-  color: #64748b;
-  font-size: 0.58rem;
-  font-weight: 650;
-  line-height: 1.25;
-}
-
+.arch-node-request .arch-node-icon,
 .arch-node-srf .arch-node-icon {
-  color: #0891b2;
+  color: #0e7490;
   background: #cffafe;
 }
 
 .arch-node-agent .arch-node-icon {
-  color: #7c3aed;
-  background: #f3e8ff;
+  color: #6d28d9;
+  background: #ede9fe;
+}
+
+.arch-node-skill {
+  min-inline-size: 9rem;
+  max-inline-size: 14rem;
+  border-color: rgba(245, 158, 11, 0.36);
+  background: rgba(255, 251, 235, 0.98);
+}
+
+.arch-node-skill .arch-node-icon {
+  color: #b45309;
+  background: #fef3c7;
 }
 
 .arch-node-registry {
-  width: 168px;
-  min-height: 146px;
-  border-color: rgba(245, 158, 11, 0.34);
-  background: linear-gradient(180deg, rgba(255, 251, 235, 0.86), rgba(255, 255, 255, 0.98));
+  min-inline-size: 9.5rem;
+  max-inline-size: 15rem;
+  padding: 0.5rem 0.62rem;
+  border-color: rgba(245, 158, 11, 0.36);
+  background: rgba(255, 251, 235, 0.98);
 }
 
 .arch-node-registry .arch-node-icon {
@@ -413,148 +292,613 @@
   background: #fef3c7;
 }
 
-.arch-node-gateway .arch-node-icon {
+.arch-node-srf {
+  inline-size: fit-content;
+  min-inline-size: 8.5rem;
+  padding: 0.42rem 0.62rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.arch-node-srf .arch-node-heading {
+  gap: 0.42rem;
+}
+
+.arch-node-srf .arch-node-icon {
+  width: 1.48rem;
+  height: 1.48rem;
+  border-radius: 999px;
+}
+
+.arch-node-srf .arch-node-description {
+  display: none;
+}
+
+.arch-node-nf {
+  min-inline-size: 10rem;
+  max-inline-size: 15rem;
+  padding: 0.5rem;
+  border-color: rgba(14, 165, 233, 0.28);
+  background: rgba(255, 255, 255, 0.98);
+}
+
+.arch-node-nf .arch-node-icon {
   color: #0369a1;
   background: #e0f2fe;
 }
 
-.arch-node-nf {
-  width: 172px;
-  min-height: 86px;
-  padding: 0.62rem;
-  border-color: rgba(14, 165, 233, 0.28);
-  background: linear-gradient(180deg, rgba(240, 249, 255, 0.9), rgba(255, 255, 255, 0.98));
+.arch-node-nf .arch-node-description {
+  display: none;
+}
+
+.arch-node-nf .arch-node-heading {
+  gap: 0.42rem;
 }
 
 .arch-node-nf .arch-node-icon {
-  width: 1.8rem;
-  height: 1.8rem;
-  color: #0284c7;
-  background: #e0f2fe;
-}
-
-.arch-node-agent {
-  width: 132px;
-  min-height: 50px;
-  padding: 0.54rem;
-}
-
-.arch-node-agent .arch-node-icon {
   width: 1.55rem;
   height: 1.55rem;
 }
 
-.arch-node-agent .arch-node-heading {
-  gap: 0.46rem;
+.arch-node-copy {
+  min-width: 0;
 }
 
-.arch-node-pill {
-  width: auto;
-  min-width: 120px;
-  min-height: 44px;
-  padding: 0.4rem 0.6rem;
-  border-radius: 999px;
-  display: flex;
-  align-items: center;
+.arch-node-label {
+  color: #0f172a;
+  font-size: 0.78rem;
+  font-weight: 850;
+  line-height: 1.15;
 }
 
-.arch-node-pill .arch-node-heading {
-  gap: 0.45rem;
+.arch-node-subtitle {
+  margin-top: 0.16rem;
+  color: #64748b;
+  font-size: 0.6rem;
+  font-weight: 700;
+  line-height: 1.25;
 }
 
-.arch-node-pill .arch-node-icon {
-  width: 1.5rem;
-  height: 1.5rem;
-  border-radius: 999px;
+.arch-node-description {
+  margin: 0.44rem 0 0;
+  color: #475569;
+  font-size: 0.64rem;
+  font-weight: 650;
+  line-height: 1.38;
 }
 
-.arch-node-pill .arch-node-label {
-  font-size: 0.72rem;
-  line-height: 1;
-}
-
-.arch-node-pill .arch-node-subtitle {
-  margin-top: 0.12rem;
-  font-size: 0.56rem;
-}
-
-.arch-node-pill .arch-node-copy {
-  display: flex;
-  flex-direction: column;
-}
-
-.arch-node-nf .arch-node-heading {
-  align-items: flex-start;
-}
-
-.arch-skill-list,
+.arch-capability-list,
 .arch-tool-list {
   display: grid;
-  gap: 0.38rem;
-  margin-top: 0.7rem;
+  gap: 0.3rem;
+  margin-top: 0.46rem;
 }
 
-.arch-skill-pill,
+.arch-capability-pill,
 .arch-tool-pill {
-  position: relative;
   border-radius: 8px;
-  font-size: 0.64rem;
-  font-weight: 820;
-  line-height: 1.2;
+  font-size: 0.62rem;
+  font-weight: 780;
+  line-height: 1.22;
 }
 
-.arch-skill-pill {
-  padding: 0.34rem 0.46rem;
-  border: 1px solid rgba(245, 158, 11, 0.34);
-  background: rgba(255, 251, 235, 0.9);
-  color: #92400e;
+.arch-capability-pill {
+  padding: 0.32rem 0.42rem;
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  background: rgba(245, 243, 255, 0.84);
+  color: #5b21b6;
 }
 
 .arch-tool-pill {
-  padding: 0.34rem 0.42rem 0.34rem 0.62rem;
-  border: 1px solid rgba(14, 165, 233, 0.28);
-  background: rgba(255, 255, 255, 0.9);
+  display: block;
+  padding: 0.28rem 0.36rem;
+  border: 1px solid rgba(14, 165, 233, 0.26);
+  background: rgba(240, 249, 255, 0.86);
   color: #075985;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+  transition: border-color 0.24s ease, background 0.24s ease, box-shadow 0.24s ease;
 }
 
-.arch-tool-pill span {
-  display: block;
+.arch-tool-pill.is-active-tool {
+  border-color: rgba(14, 165, 233, 0.62);
+  background: rgba(224, 242, 254, 0.98);
+  box-shadow: inset 0 0 0 1px rgba(14, 165, 233, 0.18);
+}
+
+.arch-tool-name,
+.arch-tool-purpose {
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.arch-tool-name {
   white-space: nowrap;
 }
 
-.arch-card-handle,
-.arch-tool-handle {
-  width: 9px;
-  height: 9px;
-  border: 2px solid #ffffff;
-  background: #94a3b8;
-  box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.5);
-  z-index: 5;
-  opacity: 0;
-  transition: opacity 0.15s ease, box-shadow 0.15s ease;
+.arch-tool-purpose {
+  display: none;
 }
 
 .arch-card-handle {
-  pointer-events: auto;
+  width: 1px;
+  height: 1px;
+  min-width: 1px;
+  min-height: 1px;
+  border: 0;
+  background: transparent;
+  opacity: 0;
+  pointer-events: none;
 }
 
-.arch-card-source {
-  background: #64748b;
+.arch-process-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  overflow: hidden;
 }
 
-.arch-tool-handle {
-  left: -5px;
-  background: #0ea5e9;
-  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.14);
+.arch-process-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
 }
 
-.arch-node:hover .arch-card-handle,
-.arch-node.is-selected .arch-card-handle,
-.arch-tool-pill:hover .arch-tool-handle {
-  opacity: 0.78;
+.arch-process-line {
+  fill: none;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  filter: drop-shadow(0 5px 10px rgba(15, 23, 42, 0.1));
+}
+
+.arch-process-line-intent,
+.arch-process-line-owner {
+  stroke: #0f766e;
+}
+
+.arch-process-line-agent,
+.arch-process-line-skill {
+  stroke: #7c3aed;
+}
+
+.arch-process-line-tool {
+  stroke: #0284c7;
+}
+
+.arch-arrow-fill-intent,
+.arch-arrow-fill-owner {
+  fill: #0f766e;
+}
+
+.arch-arrow-fill-agent,
+.arch-arrow-fill-skill {
+  fill: #7c3aed;
+}
+
+.arch-arrow-fill-tool {
+  fill: #0284c7;
+}
+
+.arch-process-endpoint {
+  stroke: #ffffff;
+  stroke-width: 2;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.arch-process-endpoint-intent,
+.arch-process-endpoint-owner {
+  fill: #0f766e;
+}
+
+.arch-process-endpoint-agent,
+.arch-process-endpoint-skill {
+  fill: #7c3aed;
+}
+
+.arch-process-endpoint-tool {
+  fill: #0284c7;
+}
+
+.arch-flow-chip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-radius: 8px;
+  padding: 0.3rem 0.44rem;
+  border: 1px solid rgba(20, 184, 166, 0.28);
+  background: rgba(255, 255, 255, 0.96);
+  color: #0f766e;
+  font-size: 0.62rem;
+  font-weight: 850;
+  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.12);
+}
+
+.arch-motion-card {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--arch-flow-card-width);
+  translate: -50% -50%;
+  z-index: 4;
+}
+
+.arch-flow-chip {
+  transform: translate(calc(var(--chip-start-x) - 50%), calc(var(--chip-start-y) - 50%));
+  animation: arch-chip-flow 0.9s ease var(--chip-delay) both;
+}
+
+.arch-flow-card-face {
+  width: var(--arch-flow-card-width);
+  min-height: var(--arch-flow-card-height);
+  display: grid;
+  align-content: center;
+  gap: 0.08rem;
+  border-radius: 8px;
+  padding: 0.34rem 0.42rem;
+  border: 1px solid rgba(20, 184, 166, 0.28);
+  background: rgba(255, 255, 255, 0.96);
+  color: #0f766e;
+  font-size: 0.62rem;
+  font-weight: 850;
+  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.12);
+}
+
+.arch-flow-card-face span {
+  font-size: 0.52rem;
+  font-weight: 850;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.arch-flow-card-face strong {
+  color: #0f172a;
+  font-size: 0.64rem;
+  line-height: 1.22;
+}
+
+.arch-flow-chip-agent,
+.arch-flow-chip-skill {
+  border-color: rgba(124, 58, 237, 0.28);
+  color: #5b21b6;
+}
+
+.arch-flow-chip-tool {
+  border-color: rgba(14, 165, 233, 0.32);
+  color: #075985;
+}
+
+.arch-flow-chip-owner {
+  border-color: rgba(20, 184, 166, 0.34);
+  background: rgba(240, 253, 250, 0.98);
+  color: #0f766e;
+}
+
+.arch-flow-card-face-intent {
+  border-color: rgba(20, 184, 166, 0.34);
+  background: rgba(240, 253, 250, 0.98);
+  color: #0f766e;
+}
+
+.arch-flow-card-face-agent {
+  border-color: rgba(124, 58, 237, 0.3);
+  background: rgba(245, 243, 255, 0.98);
+  color: #5b21b6;
+}
+
+.arch-flow-card-face-skill {
+  border-color: rgba(245, 158, 11, 0.34);
+  background: rgba(255, 251, 235, 0.98);
+  color: #92400e;
+}
+
+.arch-flow-card-face-tool,
+.arch-flow-card-face-owner {
+  border-color: rgba(14, 165, 233, 0.32);
+  background: rgba(240, 249, 255, 0.98);
+  color: #075985;
+}
+
+.arch-flow-card-face.is-active {
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.12), 0 12px 26px rgba(15, 23, 42, 0.12);
+}
+
+.arch-artifact-shelf {
+  display: block;
+  margin-top: 0.5rem;
+  position: relative;
+}
+
+.arch-flow-slot {
+  display: block;
+  width: var(--arch-flow-card-width);
+  height: 0;
+  pointer-events: none;
+}
+
+.arch-landed-card {
+  width: var(--arch-flow-card-width);
+  margin-top: 0;
+}
+
+.arch-landed-card + .arch-flow-slot {
+  margin-top: 0.28rem;
+}
+
+.arch-artifact-card,
+.arch-checklist-plan {
+  border-radius: 8px;
+  padding: 0.34rem 0.42rem;
+  border: 1px solid rgba(124, 58, 237, 0.22);
+  background: rgba(245, 243, 255, 0.9);
+  color: #4c1d95;
+  font-size: 0.62rem;
+  font-weight: 820;
+}
+
+.arch-artifact-card {
+  display: grid;
+  gap: 0.08rem;
+}
+
+.arch-artifact-card span,
+.arch-checklist-plan .arch-artifact-kicker {
+  font-size: 0.52rem;
+  font-weight: 850;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.arch-artifact-card strong {
+  color: #0f172a;
+  font-size: 0.64rem;
+  line-height: 1.22;
+}
+
+.arch-artifact-card-intent {
+  border-color: rgba(20, 184, 166, 0.3);
+  background: rgba(240, 253, 250, 0.96);
+  color: #0f766e;
+}
+
+.arch-artifact-card-skill {
+  border-color: rgba(245, 158, 11, 0.32);
+  background: rgba(255, 251, 235, 0.96);
+  color: #92400e;
+}
+
+.arch-artifact-card-tool,
+.arch-artifact-card-owner {
+  border-color: rgba(14, 165, 233, 0.32);
+  background: rgba(240, 249, 255, 0.96);
+  color: #075985;
+}
+
+.arch-artifact-card.is-active {
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.12);
+}
+
+.arch-checklist-plan {
+  display: grid;
+  gap: 0.24rem;
+  width: var(--arch-flow-card-width);
+  margin-top: 0.28rem;
+  border-color: rgba(14, 165, 233, 0.28);
+  background: rgba(240, 249, 255, 0.96);
+  color: #075985;
+}
+
+.arch-checklist-item {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  border-radius: 8px;
+  border: 1px solid rgba(14, 165, 233, 0.22);
+  background: rgba(255, 255, 255, 0.82);
+  padding: 0.22rem 0.3rem;
+  color: #075985;
+  line-height: 1.2;
+}
+
+.arch-agent-artifact,
+.arch-floating-chip,
+.arch-task-chip,
+.arch-intent-split span {
+  border-radius: 8px;
+  font-size: 0.62rem;
+  font-weight: 820;
+}
+
+.arch-agent-artifact {
+  margin-top: 0.52rem;
+  display: grid;
+  gap: 0.26rem;
+  border: 1px solid rgba(124, 58, 237, 0.28);
+  background: rgba(245, 243, 255, 0.94);
+  color: #4c1d95;
+  padding: 0.46rem;
+}
+
+.arch-agent-artifact-entering {
+  animation: arch-skill-enter 0.7s ease both;
+}
+
+.arch-agent-artifact-expanded {
+  animation: arch-skill-expand 0.42s ease both;
+}
+
+.arch-artifact-kicker {
+  color: #7c3aed;
+  font-size: 0.54rem;
+  font-weight: 850;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.arch-artifact-toolchain {
+  display: grid;
+  gap: 0.22rem;
+}
+
+.arch-artifact-toolchain span {
+  border: 1px solid rgba(14, 165, 233, 0.22);
+  border-radius: 8px;
+  background: rgba(240, 249, 255, 0.96);
+  color: #075985;
+  padding: 0.24rem 0.32rem;
+  font-size: 0.58rem;
+  font-weight: 780;
+  animation: arch-tool-reveal 0.42s ease both;
+}
+
+.arch-artifact-toolchain span:nth-child(2) {
+  animation-delay: 0.08s;
+}
+
+.arch-artifact-toolchain span:nth-child(3) {
+  animation-delay: 0.16s;
+}
+
+.arch-floating-chip {
+  display: inline-flex;
+  margin-top: 0.44rem;
+  border: 1px solid rgba(20, 184, 166, 0.26);
+  background: rgba(240, 253, 250, 0.96);
+  color: #0f766e;
+  padding: 0.28rem 0.38rem;
+}
+
+.arch-floating-chip-intent {
+  animation: arch-intent-chip 0.7s ease both;
+}
+
+.arch-intent-split,
+.arch-delegation-stack {
+  display: grid;
+  gap: 0.28rem;
+  margin-top: 0.48rem;
+}
+
+.arch-intent-split span,
+.arch-task-chip {
+  display: inline-flex;
+  width: fit-content;
+  padding: 0.28rem 0.38rem;
+  border: 1px solid rgba(20, 184, 166, 0.26);
+  background: rgba(240, 253, 250, 0.96);
+  color: #0f766e;
+}
+
+.arch-task-chip-connection {
+  animation: arch-task-connection 0.58s ease both;
+}
+
+.arch-task-chip-data {
+  animation: arch-task-data 0.58s ease both;
+}
+
+@keyframes arch-skill-enter {
+  from {
+    opacity: 0;
+    transform: translateX(-1.2rem) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes arch-skill-expand {
+  from {
+    opacity: 0.72;
+    transform: scaleY(0.82);
+    transform-origin: top;
+  }
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+    transform-origin: top;
+  }
+}
+
+@keyframes arch-tool-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(-0.28rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes arch-intent-chip {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0.72;
+    transform: translateX(2.2rem);
+  }
+}
+
+@keyframes arch-task-connection {
+  from {
+    opacity: 0;
+    transform: translateX(-0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0.8rem);
+  }
+}
+
+@keyframes arch-task-data {
+  from {
+    opacity: 0;
+    transform: translateX(-0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(2.2rem);
+  }
+}
+
+@keyframes arch-line-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes arch-endpoint-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes arch-chip-flow {
+  0% {
+    opacity: 0;
+    transform: translate(calc(var(--chip-start-x) - 50%), calc(var(--chip-start-y) - 50%)) scale(0.94);
+  }
+  18% {
+    opacity: 1;
+  }
+  82% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.96;
+    transform: translate(calc(var(--chip-end-x) - 50%), calc(var(--chip-end-y) - 50%)) scale(1);
+  }
 }
 
 .arch-edge .react-flow__edge-path {
@@ -567,19 +911,23 @@
   stroke: #0891b2;
 }
 
-.arch-edge-handoff .react-flow__edge-path {
-  stroke: rgba(124, 58, 237, 0.72);
+.arch-edge-discovery .react-flow__edge-path {
+  stroke: rgba(245, 158, 11, 0.82);
+  stroke-dasharray: 7 6;
 }
 
-.arch-edge-discovery .react-flow__edge-path {
-  stroke: rgba(245, 158, 11, 0.78);
-  stroke-dasharray: 7 6;
+.arch-edge-delegation .react-flow__edge-path {
+  stroke: rgba(124, 58, 237, 0.72);
 }
 
 .arch-edge-tool-call .react-flow__edge-path {
   stroke: #0284c7;
   stroke-width: 1.45;
-  opacity: 0.72;
+}
+
+.arch-edge-ownership .react-flow__edge-path {
+  stroke: rgba(100, 116, 139, 0.7);
+  stroke-dasharray: 3 7;
 }
 
 .react-flow__edge-text {
@@ -589,44 +937,28 @@
 }
 
 .react-flow__edge-textbg {
-  fill: rgba(255, 255, 255, 0.94);
+  fill: rgba(255, 255, 255, 0.96);
   stroke: rgba(226, 232, 240, 0.9);
   stroke-width: 1;
   rx: 6;
   ry: 6;
 }
 
-.arch-domain-agent-runtime {
-  background: rgba(250, 245, 255, 0.46);
-  border: 1px solid rgba(168, 85, 247, 0.28);
-}
-
-.arch-domain-discovery {
-  background: rgba(255, 251, 235, 0.6);
-  border: 1px solid rgba(245, 158, 11, 0.34);
-}
-
-.arch-domain-nf-tool-domain {
-  background: rgba(240, 249, 255, 0.5);
-  border: 1px solid rgba(14, 165, 233, 0.28);
-}
-
-@media (max-width: 1180px) {
-  .arch-topbar {
-    grid-template-columns: minmax(0, 1fr) auto;
-  }
-}
-
 @media (max-width: 820px) {
   .arch-layout {
-    padding: 0.75rem;
+    padding: 0.55rem;
   }
 
   .arch-topbar {
-    grid-template-columns: minmax(0, 1fr);
+    min-height: 54px;
+    padding: 0.52rem 0.7rem;
   }
 
-  .arch-topbar-actions {
-    justify-content: flex-start;
+  .arch-brand h1 {
+    font-size: 0.88rem;
+  }
+
+  .arch-brand p {
+    font-size: 0.66rem;
   }
 }
