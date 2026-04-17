@@ -1,0 +1,228 @@
+{
+  "messages": [
+    {
+      "role": "system",
+      "name": "PlanningAgent",
+      "content": "You are the Planning Agent. Select the right skill, draft an execution plan, and delegate executable subtasks to specialized agents."
+    },
+    {
+      "role": "user",
+      "content": "Connect a new embodied agent into the network subnet."
+    },
+    {
+      "role": "assistant",
+      "name": "PlanningAgent",
+      "content": "Request classified as connection onboarding. I will select the appropriate skill, prepare a deterministic plan, and delegate execution to the Connection Agent."
+    },
+    {
+      "role": "assistant",
+      "name": "PlanningAgent",
+      "tool_calls": [
+        {
+          "id": "call_skill_select_001",
+          "type": "function",
+          "function": {
+            "name": "skill_select",
+            "arguments": "{\"request\":\"Connect a new embodied agent into the network subnet.\",\"available_skills\":[{\"name\":\"ACN\",\"description\":\"Process of connecting embodied agents to the network.\"}]}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_skill_select_001",
+      "name": "skill_select",
+      "content": "{\"selected_skill\":{\"name\":\"ACN\",\"description\":\"Process of connecting embodied agents to the network.\"},\"reason\":\"Best semantic match for embodied agent subnet onboarding and connection establishment.\"}"
+    },
+    {
+      "role": "assistant",
+      "name": "PlanningAgent",
+      "content": "Skill selected: ACN."
+    },
+    {
+      "role": "assistant",
+      "name": "PlanningAgent",
+      "tool_calls": [
+        {
+          "id": "call_draft_plan_001",
+          "type": "function",
+          "function": {
+            "name": "draft_plan",
+            "arguments": "{\"skill_name\":\"ACN\",\"workflow\":[\"Subscription_tool\",\"Create_Or_Update_Subnet_Context_tool\",\"Issue_Access_Token_tool\",\"Validate_Access_Token_tool\",\"Create_Subnet_PDUSession_tool\"],\"constraints\":{\"must_preserve_shared_parameters\":true,\"abort_on_any_failure\":true},\"task_input\":{\"ue_id\":\"SUCI_46000_00000012345\",\"agent_id\":\"robot_dog_01\",\"service_type\":\"SubnetAccess\",\"existing_agent_list\":[\"phone_agent_01\",\"camera_agent_01\"],\"subnet_specification\":4}}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_draft_plan_001",
+      "name": "draft_plan",
+      "content": "{\"plan_id\":\"plan_acn_001\",\"summary\":\"Execute ACN in fixed order with shared parameter binding and abort-on-failure semantics.\",\"execution_steps\":[{\"step\":1,\"tool\":\"Subscription_tool\"},{\"step\":2,\"tool\":\"Create_Or_Update_Subnet_Context_tool\"},{\"step\":3,\"tool\":\"Issue_Access_Token_tool\"},{\"step\":4,\"tool\":\"Validate_Access_Token_tool\"},{\"step\":5,\"tool\":\"Create_Subnet_PDUSession_tool\"}]}"
+    },
+    {
+      "role": "assistant",
+      "name": "PlanningAgent",
+      "content": "Plan drafted. This is a connection-specific task, so I will delegate execution to the Connection Agent."
+    },
+    {
+      "role": "assistant",
+      "name": "PlanningAgent",
+      "tool_calls": [
+        {
+          "id": "call_delegate_task_001",
+          "type": "function",
+          "function": {
+            "name": "delegate_task",
+            "arguments": "{\"target_agent\":\"ConnectionAgent\",\"service_id\":\"svc_acn_0001\",\"task_id\":\"task_acn_connect_0001\",\"plan_id\":\"plan_acn_001\",\"task_description\":\"Connect embodied agent robot_dog_01 into collaborative subnet using ACN skill.\",\"task_input\":{\"ue_id\":\"SUCI_46000_00000012345\",\"agent_id\":\"robot_dog_01\",\"service_type\":\"SubnetAccess\",\"existing_agent_list\":[\"phone_agent_01\",\"camera_agent_01\"],\"subnet_specification\":4},\"requirements\":{\"must_follow_plan_order\":true,\"abort_on_any_failure\":true}}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_delegate_task_001",
+      "name": "delegate_task",
+      "content": "{\"accepted\":true,\"target_agent\":\"ConnectionAgent\",\"status\":\"running\"}"
+    },
+    {
+      "role": "assistant",
+      "name": "ConnectionAgent",
+      "content": "Task accepted. I will execute the ACN workflow exactly in the prescribed order."
+    },
+    {
+      "role": "assistant",
+      "name": "ConnectionAgent",
+      "tool_calls": [
+        {
+          "id": "call_subscription_001",
+          "type": "function",
+          "function": {
+            "name": "Subscription_tool",
+            "arguments": "{\"ue_id\":\"SUCI_46000_00000012345\",\"service_type\":\"SubnetAccess\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_subscription_001",
+      "name": "Subscription_tool",
+      "content": "{\"is_subscribed\":true}"
+    },
+    {
+      "role": "assistant",
+      "name": "ConnectionAgent",
+      "content": "Step 1 passed. Subscription is valid."
+    },
+    {
+      "role": "assistant",
+      "name": "ConnectionAgent",
+      "tool_calls": [
+        {
+          "id": "call_subnet_context_001",
+          "type": "function",
+          "function": {
+            "name": "Create_Or_Update_Subnet_Context_tool",
+            "arguments": "{\"ue_id\":\"SUCI_46000_00000012345\",\"agent_list\":[\"phone_agent_01\",\"camera_agent_01\"],\"subnet_specification\":4}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_subnet_context_001",
+      "name": "Create_Or_Update_Subnet_Context_tool",
+      "content": "{\"success\":true,\"subnet_id\":\"subnet_family_042\"}"
+    },
+    {
+      "role": "assistant",
+      "name": "ConnectionAgent",
+      "content": "Step 2 passed. Subnet context is ready with subnet_id=subnet_family_042."
+    },
+    {
+      "role": "assistant",
+      "name": "ConnectionAgent",
+      "tool_calls": [
+        {
+          "id": "call_issue_token_001",
+          "type": "function",
+          "function": {
+            "name": "Issue_Access_Token_tool",
+            "arguments": "{\"subnet_id\":\"subnet_family_042\",\"agent_id\":\"robot_dog_01\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_issue_token_001",
+      "name": "Issue_Access_Token_tool",
+      "content": "{\"success\":true,\"token\":{\"token_id\":\"atk_subnet_family_042_robot_dog_01\",\"issuer\":\"IDM\",\"scope\":\"subnet:join\",\"subnet_id\":\"subnet_family_042\",\"agent_id\":\"robot_dog_01\"}}"
+    },
+    {
+      "role": "assistant",
+      "name": "ConnectionAgent",
+      "content": "Step 3 passed. Access token issued."
+    },
+    {
+      "role": "assistant",
+      "name": "ConnectionAgent",
+      "tool_calls": [
+        {
+          "id": "call_validate_token_001",
+          "type": "function",
+          "function": {
+            "name": "Validate_Access_Token_tool",
+            "arguments": "{\"agent_id\":\"robot_dog_01\",\"subnet_id\":\"subnet_family_042\",\"provided_token\":{\"token_id\":\"atk_subnet_family_042_robot_dog_01\",\"issuer\":\"IDM\",\"scope\":\"subnet:join\",\"subnet_id\":\"subnet_family_042\",\"agent_id\":\"robot_dog_01\"}}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_validate_token_001",
+      "name": "Validate_Access_Token_tool",
+      "content": "{\"is_valid\":true}"
+    },
+    {
+      "role": "assistant",
+      "name": "ConnectionAgent",
+      "content": "Step 4 passed. Token validation succeeded."
+    },
+    {
+      "role": "assistant",
+      "name": "ConnectionAgent",
+      "tool_calls": [
+        {
+          "id": "call_create_pdu_001",
+          "type": "function",
+          "function": {
+            "name": "Create_Subnet_PDUSession_tool",
+            "arguments": "{\"agent_id\":\"robot_dog_01\",\"subnet_id\":\"subnet_family_042\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_create_pdu_001",
+      "name": "Create_Subnet_PDUSession_tool",
+      "content": "{\"success\":true,\"pdu_session_id\":\"pdu_subnet_family_042_robot_dog_01\"}"
+    },
+    {
+      "role": "assistant",
+      "name": "ConnectionAgent",
+      "content": "Step 5 passed. PDU session established."
+    },
+    {
+      "role": "assistant",
+      "name": "ConnectionAgent",
+      "content": "DONE"
+    },
+    {
+      "role": "assistant",
+      "name": "PlanningAgent",
+      "content": "Subtask completed successfully. Final result: robot_dog_01 connected to subnet_family_042 with PDU session pdu_subnet_family_042_robot_dog_01."
+    }
+  ]
+}

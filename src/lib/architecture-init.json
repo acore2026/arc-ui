@@ -1,0 +1,308 @@
+[
+  {
+    "id": "group-agent",
+    "parentId": null,
+    "position": {
+      "x": 260,
+      "y": 70
+    },
+    "style": {
+      "width": 820,
+      "height": 390
+    },
+    "data": {
+      "label": "Agent Runtime",
+      "type": "domain",
+      "domain": "Agent Runtime",
+      "subtitle": "Decision layer"
+    },
+    "type": "architectureNode"
+  },
+  {
+    "id": "group-nf",
+    "parentId": null,
+    "position": {
+      "x": 1150,
+      "y": 70
+    },
+    "style": {
+      "width": 300,
+      "height": 620
+    },
+    "data": {
+      "label": "NF Tool Domain",
+      "type": "domain",
+      "domain": "NF Tool Domain",
+      "subtitle": "Callable tool providers"
+    },
+    "type": "architectureNode"
+  },
+  {
+    "id": "srf",
+    "parentId": null,
+    "position": {
+      "x": 80,
+      "y": 250
+    },
+    "data": {
+      "label": "SRF",
+      "type": "srf",
+      "domain": "Ingress",
+      "subtitle": "Request normalizer",
+      "description": "Normalizes the user request before it enters the agent runtime.",
+      "showDefaultHandles": true
+    },
+    "type": "architectureNode"
+  },
+  {
+    "id": "system-agent",
+    "parentId": "group-agent",
+    "position": {
+      "x": 42,
+      "y": 180
+    },
+    "data": {
+      "label": "System Agent",
+      "type": "agent",
+      "domain": "Agent Runtime",
+      "subtitle": "Dispatcher",
+      "description": "Classifies the task and routes work to specialized agents.",
+      "showDefaultHandles": true
+    },
+    "type": "architectureNode"
+  },
+  {
+    "id": "compute-agent",
+    "parentId": "group-agent",
+    "position": {
+      "x": 250,
+      "y": 48
+    },
+    "data": {
+      "label": "Compute Agent",
+      "type": "agent",
+      "domain": "Agent Runtime",
+      "subtitle": "Compute support",
+      "description": "Represents compute support when a service needs placement or resources.",
+      "showDefaultHandles": true
+    },
+    "type": "architectureNode"
+  },
+  {
+    "id": "sense-agent",
+    "parentId": "group-agent",
+    "position": {
+      "x": 250,
+      "y": 168
+    },
+    "data": {
+      "label": "Sense Agent",
+      "type": "agent",
+      "domain": "Agent Runtime",
+      "subtitle": "Sensing workflow",
+      "description": "Handles the sensing-specific part of the request.",
+      "showDefaultHandles": true
+    },
+    "type": "architectureNode"
+  },
+  {
+    "id": "connection-agent",
+    "parentId": "group-agent",
+    "position": {
+      "x": 250,
+      "y": 288
+    },
+    "data": {
+      "label": "Connection Agent",
+      "type": "agent",
+      "domain": "Agent Runtime",
+      "subtitle": "Connectivity prep",
+      "description": "Handles connectivity preparation before the sensing service runs.",
+      "showDefaultHandles": true
+    },
+    "type": "architectureNode"
+  },
+  {
+    "id": "acrf",
+    "parentId": "group-agent",
+    "position": {
+      "x": 520,
+      "y": 46
+    },
+    "data": {
+      "label": "ACRF",
+      "type": "registry",
+      "domain": "Agent Runtime",
+      "subtitle": "Capability registry",
+      "description": "Indexes capabilities and returns matching skills. It is not an executor.",
+      "showDefaultHandles": true,
+      "skills": [
+        {
+          "id": "network-prepare",
+          "label": "network.prepare-session"
+        },
+        {
+          "id": "sensing-context",
+          "label": "sensing.execute-with-context"
+        },
+        {
+          "id": "compute-reserve",
+          "label": "compute.reserve"
+        },
+        {
+          "id": "policy-match",
+          "label": "policy.match"
+        }
+      ]
+    },
+    "type": "architectureNode"
+  },
+  {
+    "id": "igw",
+    "parentId": "group-agent",
+    "position": {
+      "x": 548,
+      "y": 288
+    },
+    "data": {
+      "label": "IGW",
+      "type": "gateway",
+      "domain": "Agent Runtime",
+      "subtitle": "Invocation bridge",
+      "description": "Bridges selected capability calls into concrete tool invocation.",
+      "showDefaultHandles": true
+    },
+    "type": "architectureNode"
+  },
+  {
+    "id": "am",
+    "parentId": "group-nf",
+    "position": {
+      "x": 32,
+      "y": 46
+    },
+    "data": {
+      "label": "AM",
+      "type": "nf",
+      "domain": "NF Tool Domain",
+      "subtitle": "Access",
+      "description": "Provides access and session-admission tools.",
+      "showDefaultHandles": true,
+      "tools": [
+        {
+          "id": "prepare-access",
+          "label": "prepareAccess"
+        },
+        {
+          "id": "admit-device",
+          "label": "admitDevice"
+        }
+      ]
+    },
+    "type": "architectureNode"
+  },
+  {
+    "id": "sm",
+    "parentId": "group-nf",
+    "position": {
+      "x": 32,
+      "y": 164
+    },
+    "data": {
+      "label": "SM",
+      "type": "nf",
+      "domain": "NF Tool Domain",
+      "subtitle": "Session",
+      "description": "Provides session context and setup tools.",
+      "showDefaultHandles": true,
+      "tools": [
+        {
+          "id": "setup-session",
+          "label": "setupSession"
+        },
+        {
+          "id": "bind-context",
+          "label": "bindContext"
+        }
+      ]
+    },
+    "type": "architectureNode"
+  },
+  {
+    "id": "policy",
+    "parentId": "group-nf",
+    "position": {
+      "x": 32,
+      "y": 282
+    },
+    "data": {
+      "label": "Policy",
+      "type": "nf",
+      "domain": "NF Tool Domain",
+      "subtitle": "Decision",
+      "description": "Provides policy and resource decision tools.",
+      "showDefaultHandles": true,
+      "tools": [
+        {
+          "id": "evaluate-policy",
+          "label": "evaluatePolicy"
+        },
+        {
+          "id": "select-profile",
+          "label": "selectProfile"
+        }
+      ]
+    },
+    "type": "architectureNode"
+  },
+  {
+    "id": "db",
+    "parentId": "group-nf",
+    "position": {
+      "x": 32,
+      "y": 400
+    },
+    "data": {
+      "label": "DB",
+      "type": "nf",
+      "domain": "NF Tool Domain",
+      "subtitle": "State lookup",
+      "description": "Provides profile and context lookup tools.",
+      "showDefaultHandles": true,
+      "tools": [
+        {
+          "id": "lookup-profile",
+          "label": "lookupProfile"
+        }
+      ]
+    },
+    "type": "architectureNode"
+  },
+  {
+    "id": "up",
+    "parentId": "group-nf",
+    "position": {
+      "x": 32,
+      "y": 500
+    },
+    "data": {
+      "label": "UP",
+      "type": "nf",
+      "domain": "NF Tool Domain",
+      "subtitle": "Forwarding",
+      "description": "Provides execution and forwarding-related tools.",
+      "showDefaultHandles": true,
+      "tools": [
+        {
+          "id": "prepare-forwarding",
+          "label": "prepareForwarding"
+        },
+        {
+          "id": "execute-sensing",
+          "label": "executeSensingTask"
+        }
+      ]
+    },
+    "type": "architectureNode"
+  }
+]
