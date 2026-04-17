@@ -48,6 +48,8 @@ export interface ArchitectureNodeData extends Record<string, unknown> {
     role: string;
     name: string;
     text: string;
+    shortText?: string;
+    timestamp?: string;
     isTool: boolean;
     toolName?: string;
     toolDetails?: { key: string; value: string }[];
@@ -209,38 +211,10 @@ export const ARCHITECTURE_NODES: Node<ArchitectureNodeData>[] = [
     },
   },
   {
-    id: 'connection-agent',
-    parentId: 'group-agents',
-    type: 'architectureNode',
-    position: { x: 390, y: 54 },
-    extent: 'parent',
-    data: {
-      label: 'Connection Agent',
-      type: 'agent',
-      domain: 'Agent Layer',
-      subtitle: 'Connectivity domain',
-      description: 'Connection and QoS tasks.',
-    },
-  },
-  {
-    id: 'data-agent',
-    parentId: 'group-agents',
-    type: 'architectureNode',
-    position: { x: 390, y: 292 },
-    extent: 'parent',
-    data: {
-      label: 'Data Agent',
-      type: 'agent',
-      domain: 'Agent Layer',
-      subtitle: 'Data domain',
-      description: 'Data tasks.',
-    },
-  },
-  {
     id: 'computing-agent',
     parentId: 'group-agents',
     type: 'architectureNode',
-    position: { x: 390, y: 388 },
+    position: { x: 390, y: 82 },
     extent: 'parent',
     data: {
       label: 'Computing Agent',
@@ -248,6 +222,20 @@ export const ARCHITECTURE_NODES: Node<ArchitectureNodeData>[] = [
       domain: 'Agent Layer',
       subtitle: 'Compute domain',
       description: 'Compute tasks.',
+    },
+  },
+  {
+    id: 'connection-agent',
+    parentId: 'group-agents',
+    type: 'architectureNode',
+    position: { x: 390, y: 242 },
+    extent: 'parent',
+    data: {
+      label: 'Connection Agent',
+      type: 'agent',
+      domain: 'Agent Layer',
+      subtitle: 'Connectivity domain',
+      description: 'Connection and QoS tasks.',
     },
   },
   {

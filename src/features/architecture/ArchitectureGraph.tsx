@@ -21,17 +21,26 @@ import {
   Cloud,
   Cpu,
   Database,
+  Download,
+  FastForward,
   FileText,
   HardDrive,
   ListChecks,
   LoaderCircle,
   Network,
+  Pause,
   Play,
+  PlayCircle,
   RadioTower,
+  Rewind,
   RotateCcw,
   Route,
   Search,
   Send,
+  SkipBack,
+  SkipForward,
+  Sparkles,
+  Wand2,
   X,
   Zap,
 } from 'lucide-react';
@@ -83,6 +92,8 @@ type Frame = {
   role: string;
   name: string;
   text: string;
+  shortText?: string;
+  timestamp?: string;
   isTool: boolean;
   toolName?: string;
   toolDetails?: { key: string; value: string }[];
@@ -263,11 +274,34 @@ for (const msg of messages) {
   }
 
   lastPhase = phase;
+
+  let shortText = text;
+  if (msg.role === 'user') {
+    shortText = 'Intent received';
+  } else if (isTool && msg.role === 'assistant') {
+    if (toolName === 'skill_select') shortText = 'Searching ARF...';
+    else if (toolName === 'draft_plan') shortText = 'Drafting plan...';
+    else if (toolName === 'delegate_task') shortText = 'Delegating...';
+    else shortText = `Calling \`${toolName}\``;
+  } else if (isTool && msg.role === 'tool') {
+    if (toolName === 'skill_select') shortText = 'Skill selected: **ACN**';
+    else if (toolName === 'draft_plan') shortText = 'Plan ready';
+    else if (toolName === 'delegate_task') shortText = 'Task accepted';
+    else shortText = `**${toolName}** success`;
+  } else if (msg.role === 'assistant') {
+    if (text.includes('classified as')) shortText = 'Request classified';
+    else if (text.includes('Skill selected')) shortText = 'Skill chosen';
+    else if (text.includes('Plan drafted')) shortText = 'Plan finalized';
+    else if (text.includes('Subtask completed')) shortText = 'Task complete';
+    else shortText = 'Processing...';
+  }
+
   frames.push({
     phase,
     role: msg.role,
     name: msg.name || (msg.role === 'user' ? 'User' : 'System'),
     text: enrichChatText(text),
+    shortText,
     isTool,
     toolName,
     toolDetails,
@@ -395,7 +429,7 @@ const getFrameDelay = (frame: Frame) => {
   return Math.min(2800, Math.max(1400, readingTime));
 };
 
-const getNodeAnimationState = (id: string, stage: AnimationStage): ArchitectureNodeData['animationState'] => {
+const getNodeAnimationState = (id: string, stage: AnimationStage, activeTools: string[] = []): ArchitectureNodeData['animationState'] => {
   if (stage === 'idle') {
     return undefined;
   }
@@ -403,9 +437,9 @@ const getNodeAnimationState = (id: string, stage: AnimationStage): ArchitectureN
   const activeByStage: Record<Exclude<AnimationStage, 'idle'>, string[]> = {
     'intent-intake': ['ue-request', 'srf'],
     'agent-dispatch': ['ue-request', 'planning-agent'],
-    'skill-selection': ['planning-agent', 'connection-skill'],
+    'skill-selection': ['planning-agent', 'connection-skill', 'group-repositories'],
     delegation: ['planning-agent', 'connection-agent'],
-    'tool-call': ['connection-agent', 'am-tools', 'udm-tools', 'sm-tools', 'up-tools'],
+    'tool-call': ['connection-agent'],
     ownership: ['connection-agent', 'sm-tools', 'up-tools'],
   };
 
@@ -413,11 +447,17 @@ const getNodeAnimationState = (id: string, stage: AnimationStage): ArchitectureN
     return 'owner';
   }
 
-  if (stage === 'tool-call' && (id === 'am-tools' || id === 'udm-tools' || id === 'sm-tools' || id === 'up-tools')) {
-    return 'active-tool';
+  if (stage === 'tool-call') {
+    const isToolNode = ['am-tools', 'udm-tools', 'sm-tools', 'up-tools'].includes(id);
+    if (isToolNode) {
+      const node = ARCHITECTURE_NODES.find(n => n.id === id);
+      const hasActiveTool = node?.data.tools?.some(t => activeTools.includes(t.id));
+      return hasActiveTool ? 'active-tool' : 'dimmed';
+    }
   }
 
-  return activeByStage[stage].includes(id) ? 'glow' : 'dimmed';
+  const baseActive = activeByStage[stage] || [];
+  return baseActive.includes(id) ? 'glow' : 'dimmed';
 };
 
 const FlowCardFace: React.FC<{ card: FlowCardDef; active?: boolean }> = ({ card, active }) => (
@@ -832,7 +872,7 @@ const AgentChatPanel: React.FC<{ frames: Frame[]; activeIndex: number; isPlaying
           const active = isActiveItem(frame, index);
           const internal = frame.role === 'assistant' && isInternalToolName(frame.toolName);
           const internalDone = hasCompletedInternal(frame.toolName, index);
-          const messageTime = formatChatTimestamp(new Date());
+          const messageTime = frame.timestamp || formatChatTimestamp(new Date());
           const itemClass = [
             'arch-chat-item',
             `arch-chat-${frame.role === 'user' ? 'intent' : frame.isTool ? 'tool' : 'message'}`,
@@ -989,16 +1029,18 @@ const ArchitectureNode: React.FC<{ data: ArchitectureNodeData }> = ({ data }) =>
             <div style={{ backgroundColor: '#f8fafc', borderRadius: '6px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
               <div style={{ padding: '6px 8px', backgroundColor: '#f1f5f9', borderBottom: '1px solid #e2e8f0', fontSize: '0.75rem', fontWeight: 600, color: '#334155', display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <Zap size={12} className="text-blue-500" />
-                {data.currentMessage.role === 'assistant' ? 'call' : 'response'}: {data.currentMessage.toolName}
+                {data.currentMessage.shortText ? <ChatMarkdown text={data.currentMessage.shortText} /> : `${data.currentMessage.role === 'assistant' ? 'call' : 'response'}: ${data.currentMessage.toolName}`}
               </div>
-              <div style={{ padding: '6px 8px', fontSize: '0.75rem', color: '#475569', fontFamily: 'monospace', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                {data.currentMessage.toolDetails?.map((detail, idx) => (
-                  <div key={idx} style={{ display: 'flex', flexDirection: 'column' }}>
-                    <span style={{ fontWeight: 600, color: '#64748b' }}>{detail.key}:</span>
-                    <span style={{ wordBreak: 'break-all' }}>{detail.value}</span>
-                  </div>
-                ))}
-              </div>
+              {!data.currentMessage.shortText && data.currentMessage.toolDetails && data.currentMessage.toolDetails.length > 0 && (
+                <div style={{ padding: '6px 8px', fontSize: '0.75rem', color: '#475569', fontFamily: 'monospace', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  {data.currentMessage.toolDetails?.map((detail, idx) => (
+                    <div key={idx} style={{ display: 'flex', flexDirection: 'column' }}>
+                      <span style={{ fontWeight: 600, color: '#64748b' }}>{detail.key}:</span>
+                      <span style={{ wordBreak: 'break-all' }}>{detail.value}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           ) : data.currentMessage.isSystemAction ? (
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
@@ -1006,7 +1048,7 @@ const ArchitectureNode: React.FC<{ data: ArchitectureNodeData }> = ({ data }) =>
                 <Check size={12} className="text-blue-600" />
               </div>
               <div style={{ fontSize: '0.85rem', color: '#1e293b', fontWeight: 500, lineHeight: 1.4 }}>
-                {data.currentMessage.text}
+                <ChatMarkdown text={data.currentMessage.shortText || data.currentMessage.text} />
               </div>
             </div>
           ) : (
@@ -1014,10 +1056,15 @@ const ArchitectureNode: React.FC<{ data: ArchitectureNodeData }> = ({ data }) =>
               <div style={{ fontSize: '0.7rem', fontWeight: 'bold', color: '#64748b', textTransform: 'uppercase', marginBottom: '4px' }}>
                 {data.currentMessage.name || 'User'}
               </div>
-              <div style={{ fontSize: '0.85rem', color: '#0f172a', fontFamily: 'inherit', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-                {data.currentMessage.text}
+              <div style={{ fontSize: '0.85rem', color: '#0f172a', fontFamily: 'inherit' }}>
+                <ChatMarkdown text={data.currentMessage.shortText || data.currentMessage.text} />
               </div>
             </>
+          )}
+          {data.currentMessage.timestamp && (
+             <div style={{ marginTop: '8px', textAlign: 'right', fontSize: '0.6rem', color: '#94a3b8', borderTop: '1px solid #f1f5f9', paddingTop: '4px' }}>
+                {data.currentMessage.timestamp}
+             </div>
           )}
           <div style={{
             position: 'absolute',
@@ -1181,6 +1228,7 @@ const ArchitectureGraph: React.FC = () => {
   const [storyPhase, setStoryPhase] = useState<StoryPhase>('idle');
   const [completedArtifacts, setCompletedArtifacts] = useState<ArtifactId[]>([]);
   const [activeTools, setActiveTools] = useState<ToolId[]>([]);
+  const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const [isPlaying, setIsPlaying] = useState(false);
   const [frameIndex, setFrameIndex] = useState(-1);
   const [selectedDetail, setSelectedDetail] = useState<InspectDetail | null>(null);
@@ -1189,6 +1237,20 @@ const ArchitectureGraph: React.FC = () => {
   const activeStage = phaseToStage(storyPhase);
   const currentFrame = frameIndex >= 0 && frameIndex < frames.length ? frames[frameIndex] : null;
   const msgcapFilename = useMemo(() => formatMsgcapFilename(new Date()), []);
+
+  const getSpeedDelay = useCallback((frame: Frame) => {
+    return getFrameDelay(frame) / playbackSpeed;
+  }, [playbackSpeed]);
+
+  const handleStop = useCallback(() => {
+    runRef.current += 1;
+    setIsPlaying(false);
+    setFrameIndex(-1);
+    setStoryPhase('idle');
+    setCompletedArtifacts([]);
+    setActiveTools([]);
+    frames.forEach(f => f.timestamp = undefined);
+  }, []);
 
   const openSkillDetail = useCallback((nodeId: string) => {
     const node = ARCHITECTURE_NODES.find((candidate) => candidate.id === nodeId);
@@ -1228,22 +1290,46 @@ const ArchitectureGraph: React.FC = () => {
   }, []);
 
   const nodes = useMemo<Node<ArchitectureNodeData>[]>(() => {
-    return ARCHITECTURE_NODES.map((node) => ({
-      ...node,
-      data: {
-        ...node.data,
-        nodeId: node.id,
-        animationStage: activeStage,
-        animationState: getNodeAnimationState(node.id, activeStage),
-        storyPhase,
-        completedArtifacts,
-        activeTools,
-        currentMessage: undefined,
-        onInspectSkill: openSkillDetail,
-        onInspectTool: openToolDetail,
-      },
-    }));
-  }, [activeStage, activeTools, completedArtifacts, storyPhase, openSkillDetail, openToolDetail]);
+    return ARCHITECTURE_NODES.map((node) => {
+      let currentMessage: ArchitectureNodeData['currentMessage'] | undefined = undefined;
+      
+      if (frameIndex >= 0 && frameIndex < frames.length) {
+        const frame = frames[frameIndex];
+        if (frame.activeNodeId === node.id) {
+          currentMessage = {
+            role: frame.role,
+            name: frame.name,
+            text: frame.text,
+            shortText: frame.shortText,
+            timestamp: frame.timestamp,
+            isTool: frame.isTool,
+            toolName: frame.toolName,
+            toolDetails: frame.toolDetails,
+            isSystemAction: frame.isSystemAction,
+            systemIcon: frame.systemIcon,
+            activeNodeId: frame.activeNodeId
+          };
+        }
+      }
+
+      return {
+        ...node,
+        zIndex: currentMessage ? 1000 : 1,
+        data: {
+          ...node.data,
+          nodeId: node.id,
+          animationStage: activeStage,
+          animationState: getNodeAnimationState(node.id, activeStage, activeTools),
+          storyPhase,
+          completedArtifacts,
+          activeTools,
+          currentMessage,
+          onInspectSkill: openSkillDetail,
+          onInspectTool: openToolDetail,
+        },
+      };
+    });
+  }, [activeStage, activeTools, completedArtifacts, storyPhase, frameIndex, openSkillDetail, openToolDetail]);
 
   const edges = useMemo<Edge[]>(() => {
     return [
@@ -1259,6 +1345,32 @@ const ArchitectureGraph: React.FC = () => {
           isVisible: storyPhase === 'intent-to-planning',
           tokenVisible: false,
           tokenCard: flowCards['planning-intent'],
+        },
+      },
+      {
+        id: 'planning-arf',
+        source: 'planning-agent',
+        target: 'group-repositories',
+        sourceHandle: 'top',
+        targetHandle: 'bottom',
+        type: 'storyEdge',
+        data: {
+          tone: 'skill',
+          isVisible: storyPhase === 'skill-lookup',
+          tokenVisible: false,
+        },
+      },
+      {
+        id: 'arf-planning',
+        source: 'group-repositories',
+        target: 'planning-agent',
+        sourceHandle: 'bottom',
+        targetHandle: 'top',
+        type: 'storyEdge',
+        data: {
+          tone: 'skill',
+          isVisible: storyPhase === 'skill-to-planning',
+          tokenVisible: false,
         },
       },
       {
@@ -1365,6 +1477,7 @@ const ArchitectureGraph: React.FC = () => {
     setActiveTools([]);
     setStoryPhase('idle');
     setFrameIndex(-1);
+    frames.forEach(f => f.timestamp = undefined);
     await sleep(180);
 
     let currentArtifacts: ArtifactId[] = [];
@@ -1373,6 +1486,9 @@ const ArchitectureGraph: React.FC = () => {
       if (runRef.current !== runId) return;
 
       const frame = frames[i];
+      if (!frame.timestamp) {
+        frame.timestamp = formatChatTimestamp(new Date());
+      }
       setFrameIndex(i);
       setStoryPhase(frame.phase);
 
@@ -1397,7 +1513,7 @@ const ArchitectureGraph: React.FC = () => {
          }
       }
 
-      await sleep(getFrameDelay(frame));
+      await sleep(getSpeedDelay(frame));
     }
 
     if (runRef.current !== runId) return;
@@ -1413,28 +1529,90 @@ const ArchitectureGraph: React.FC = () => {
   return (
     <div className="arch-demo">
       <header className="arch-topbar">
-        <div className="arch-brand">
-          <div className="arch-brand-mark">
-            <Zap size={15} />
-          </div>
-          <div>
+        <div className="arch-topbar-left">
+          <div className="arch-brand">
+            <div className="arch-brand-mark" style={{ background: 'linear-gradient(135deg, #7c3aed, #0284c7)', border: 'none', color: 'white' }}>
+              <Sparkles size={15} />
+            </div>
             <h1>AICore Intent Tracing Portal</h1>
-            <label className="arch-trace-picker">
-              <span>Msgcap</span>
+          </div>
+        </div>
+
+        <div className="arch-topbar-spacer" />
+
+        <div className="arch-topbar-right">
+          <label className="arch-trace-picker">
+            <span>Msgcap</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
               <select value={msgcapFilename} onChange={() => undefined} aria-label="Message capture file">
                 <option value={msgcapFilename}>{msgcapFilename}</option>
               </select>
+              <button 
+                type="button" 
+                title="Download Trace (Demo)" 
+                style={{ 
+                  background: 'transparent', 
+                  border: 'none', 
+                  color: '#94a3b8', 
+                  cursor: 'pointer', 
+                  padding: '0.2rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  opacity: 0.6,
+                  transition: 'opacity 0.2s ease'
+                }}
+                onMouseOver={(e) => (e.currentTarget.style.opacity = '1')}
+                onMouseOut={(e) => (e.currentTarget.style.opacity = '0.6')}
+              >
+                <Download size={15} />
+              </button>
+            </div>
+          </label>
+          <div className="arch-playback-controls" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+            <label className="arch-speed-selector" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginRight: '0.4rem' }}>
+              <span style={{ fontSize: '0.62rem', fontWeight: 850, color: '#64748b', textTransform: 'uppercase' }}>Speed</span>
+              <select 
+                value={playbackSpeed} 
+                onChange={(e) => setPlaybackSpeed(Number(e.target.value))}
+                style={{ padding: '0.34rem 0.5rem', border: '1px solid #e2e8f0', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600, background: 'white' }}
+              >
+                <option value={0.5}>0.5x</option>
+                <option value={1}>1.0x</option>
+                <option value={1.5}>1.5x</option>
+                <option value={2}>2.0x</option>
+              </select>
             </label>
+
+            <button 
+              type="button" 
+              className="arch-step-button" 
+              onClick={handlePlay} 
+              disabled={isPlaying} 
+              style={{ 
+                minWidth: '7.5rem', 
+                padding: '0.54rem 1rem', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                gap: '0.5rem', 
+                borderRadius: '8px', 
+                background: isPlaying ? '#e2e8f0' : '#7c3aed', 
+                color: isPlaying ? '#64748b' : 'white', 
+                border: 'none', 
+                cursor: isPlaying ? 'default' : 'pointer' 
+              }}
+            >
+              {storyPhase === 'complete' ? <RotateCcw size={18} /> : isPlaying ? <LoaderCircle size={18} className="arch-chat-spinner" /> : <Play size={18} />}
+              <span style={{ fontSize: '0.75rem', fontWeight: 700, color: isPlaying ? '#64748b' : 'white' }}>
+                {storyPhase === 'complete' ? 'Restart' : isPlaying ? 'Running' : 'Play Trace'}
+              </span>
+            </button>
           </div>
         </div>
-        <button type="button" className="arch-step-button" onClick={handlePlay} disabled={isPlaying} style={{ minWidth: 'auto', padding: '0.6rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          {storyPhase === 'complete' ? <RotateCcw size={18} /> : <Play size={18} style={{ opacity: isPlaying ? 0.5 : 1 }} />}
-        </button>
       </header>
 
       <main className="arch-layout">
         <div className="arch-workbench">
-          <AgentChatPanel frames={frames} activeIndex={frameIndex} isPlaying={isPlaying} />
           <section className="arch-canvas-shell" aria-label="NW-Agent concept sandbox">
             <svg style={{ position: 'absolute', width: 0, height: 0 }} aria-hidden="true">
               <defs>
@@ -1474,6 +1652,7 @@ const ArchitectureGraph: React.FC = () => {
               </ReactFlow>
             </div>
           </section>
+          <AgentChatPanel frames={frames} activeIndex={frameIndex} isPlaying={isPlaying} />
         </div>
       </main>
       <DetailPopout detail={selectedDetail} onClose={() => setSelectedDetail(null)} />
