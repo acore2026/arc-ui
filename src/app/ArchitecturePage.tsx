@@ -1,11 +1,15 @@
 import React from 'react';
+import AppShell from '../components/AppShell';
+import NavHeader from '../components/NavHeader';
 import ArchitectureGraph from '../features/architecture/ArchitectureGraph';
+import './ArchitecturePage.css';
 
 const ArchitecturePage: React.FC = () => {
   return (
-    <main style={{ width: '100%', height: '100dvh', minHeight: 0, background: '#ffffff' }}>
-      <ArchitectureGraph />
-    </main>
+    <AppShell
+      header={<NavHeader />}
+      mainContent={<div className="architecture-page-stage"><ArchitectureGraph /></div>}
+    />
   );
 };
 

@@ -22,25 +22,18 @@ import {
   Cpu,
   Database,
   Download,
-  FastForward,
   FileText,
   HardDrive,
   ListChecks,
   LoaderCircle,
   Network,
-  Pause,
   Play,
-  PlayCircle,
   RadioTower,
-  Rewind,
   RotateCcw,
   Route,
   Search,
   Send,
-  SkipBack,
-  SkipForward,
   Sparkles,
-  Wand2,
   X,
   Zap,
 } from 'lucide-react';
@@ -1241,16 +1234,6 @@ const ArchitectureGraph: React.FC = () => {
   const getSpeedDelay = useCallback((frame: Frame) => {
     return getFrameDelay(frame) / playbackSpeed;
   }, [playbackSpeed]);
-
-  const handleStop = useCallback(() => {
-    runRef.current += 1;
-    setIsPlaying(false);
-    setFrameIndex(-1);
-    setStoryPhase('idle');
-    setCompletedArtifacts([]);
-    setActiveTools([]);
-    frames.forEach(f => f.timestamp = undefined);
-  }, []);
 
   const openSkillDetail = useCallback((nodeId: string) => {
     const node = ARCHITECTURE_NODES.find((candidate) => candidate.id === nodeId);

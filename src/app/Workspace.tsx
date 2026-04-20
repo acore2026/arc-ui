@@ -99,8 +99,7 @@ const Workspace: React.FC = () => {
   }, [selectedNodeId, selectedEdgeId, sidePanelCollapsed, handleSidePanelTabChange]);
 
   const header = (
-    <>
-      <NavHeader />
+    <NavHeader>
       <div className="toolbar-actions">
         <Button size="sm" variant="secondary">
           <Save size={14} />
@@ -135,7 +134,7 @@ const Workspace: React.FC = () => {
           Settings
         </Button>
       </div>
-    </>
+    </NavHeader>
   );
 
   const sidePanel = (

@@ -11,6 +11,13 @@
   color: var(--text-primary);
 }
 
+.workspace-toolbar-container {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
 .workspace-main {
   flex: 1;
   min-height: 0;
