@@ -1,0 +1,12 @@
+.architecture-page-stage {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+}
+
+.architecture-page-stage > * {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}

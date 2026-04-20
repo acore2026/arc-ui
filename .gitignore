@@ -25,3 +25,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local automation artifacts
+.playwright/
+.playwright-cli/
+AGENT.md.BAK
+compressed_image.jpeg
+.codex
